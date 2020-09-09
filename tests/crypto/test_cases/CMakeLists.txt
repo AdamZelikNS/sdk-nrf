@@ -11,14 +11,15 @@ zephyr_linker_sources(RODATA
     ${CMAKE_CURRENT_SOURCE_DIR}/custom-rodata.ld
 )
 
+if(NOT CONFIG_CRYPTO_SKIP_HASH_TESTS)
 zephyr_sources_ifdef(CONFIG_MBEDTLS_SHA256_C        test_sha_256.c)
 zephyr_sources_ifdef(CONFIG_MBEDTLS_SHA512_C        test_sha_512.c)
 zephyr_sources_ifdef(CONFIG_MBEDTLS_SHA256_C        test_hmac.c)
 zephyr_sources_ifdef(CONFIG_MBEDTLS_SHA256_C        test_hkdf.c)
+endif()
 zephyr_sources_ifdef(CONFIG_MBEDTLS_ECDH_C          test_ecdh.c)
 zephyr_sources_ifdef(CONFIG_MBEDTLS_ECDSA_C         test_ecdsa.c)
 zephyr_sources_ifdef(CONFIG_MBEDTLS_AES_C           test_aes_ecb.c)
-zephyr_sources_ifdef(CONFIG_MBEDTLS_AES_C           test_aes_ecb_mac.c)
 zephyr_sources_ifdef(CONFIG_MBEDTLS_AES_C           test_aead.c)
 zephyr_sources_ifdef(CONFIG_MBEDTLS_ECJPAKE_C       test_ecjpake.c)
 zephyr_sources_ifdef(CONFIG_MBEDTLS_CIPHER_MODE_CBC test_aes_cbc.c)
@@ -41,13 +42,16 @@ zephyr_sources_ifdef(CONFIG_MBEDTLS_ECDSA_C         test_vectors_ecdsa_random.c)
 zephyr_sources_ifdef(CONFIG_MBEDTLS_ECDSA_C         test_vectors_ecdsa_sign.c)
 zephyr_sources_ifdef(CONFIG_MBEDTLS_ECDSA_C         test_vectors_ecdsa_verify.c)
 zephyr_sources_ifdef(CONFIG_MBEDTLS_ECJPAKE_C       test_vectors_ecjpake.c)
+if(NOT CONFIG_CRYPTO_SKIP_HASH_TESTS)
 zephyr_sources_ifdef(CONFIG_MBEDTLS_SHA256_C        test_vectors_hkdf.c)
 zephyr_sources_ifdef(CONFIG_MBEDTLS_SHA256_C        test_vectors_hmac.c)
 zephyr_sources_ifdef(CONFIG_MBEDTLS_SHA256_C        test_vectors_sha_256.c)
 zephyr_sources_ifdef(CONFIG_MBEDTLS_SHA512_C        test_vectors_sha_512.c)
+endif()
 
 if(CONFIG_MBEDTLS_CMAC_C OR CONFIG_MBEDTLS_CMAC_ALT)
 zephyr_sources(                                     test_vectors_aes_ecb_mac.c)
+zephyr_sources_ifdef(CONFIG_MBEDTLS_AES_C           test_aes_ecb_mac.c)
 endif()
 
 # This is set differently based on backend
