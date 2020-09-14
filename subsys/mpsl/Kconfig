@@ -47,7 +47,8 @@ choice MPSL_FEM_CHOICE
 		$(dt_nodelabel_has_compat,nrf_radio_fem,$(DT_COMPAT_SKYWORKS_SKY66112_11))
 
 config MPSL_FEM_NRF21540_GPIO
-	bool "nRF21540 front-end module in GPIO mode"
+	bool "nRF21540 front-end module in GPIO mode (not supported in multiprotocol mode)"
+	depends on !BT
 
 config MPSL_FEM_SKY66112_11
 	bool "SKY66112-11 front-end module"
