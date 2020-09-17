@@ -69,7 +69,11 @@
 .. _`system mode section in the AT Commands reference document`: https://infocenter.nordicsemi.com/topic/ref_at_commands/REF/at_commands/mob_termination_ctrl_status/xsystemmode.html
 
 .. _`Credential storage management %CMNG`: https://infocenter.nordicsemi.com/topic/ref_at_commands/REF/at_commands/mob_termination_ctrl_status/cmng.html
+
 .. _`nRF5340 Product Specification`: https://infocenter.nordicsemi.com/topic/ps_nrf5340/keyfeatures_html5.html
+.. _`nRF21540 Objective Product Specification`: https://infocenter.nordicsemi.com/topic/ps_nrf21540/keyfeatures_html5.html
+
+.. _`nRF21540`: https://infocenter.nordicsemi.com/topic/struct_fem/struct/nrf21540.html
 
 .. _`System OFF mode`: https://infocenter.nordicsemi.com/topic/ps_nrf52840/power.html#unique_1227688711
 .. _`Programming DK boards using nrfjprog`: https://infocenter.nordicsemi.com/topic/ug_nrf5x_cltools/UG/cltools/nrf5x_nrfjprogexe.html
@@ -254,6 +258,8 @@
 .. _`Device enrollments with Azure Portal`: https://docs.microsoft.com/en-us/azure/iot-dps/how-to-manage-enrollments
 .. _`Add certificates to the DPS instance`: https://docs.microsoft.com/en-us/azure/iot-dps/how-to-verify-certificates
 .. _`Registering the device with Azure IoT Hub`: https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal#register-a-new-device-in-the-iot-hub
+
+.. _`SKY66112-11 page`: https://www.skyworksinc.com/en/Products/Front-end-Modules/SKY66112-11
 
 .. ### Links to Bluetooth specs
 
