@@ -237,7 +237,7 @@ static int fem_configure(void)
 	err = fem_nrf21540_gpio_configure();
 #elif CONFIG_MPSL_FEM_SKY66112_11
 	err = fem_sky66112_11_configure();
-#elif CONFIG_MSPL_FEM
+#elif CONFIG_MPSL_FEM
 #error Incomplete CONFIG_MPSL_FEM configuration. No supported FEM type found.
 #else
 	/* No FEM in use */
