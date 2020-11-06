@@ -127,7 +127,7 @@ static uint8_t m_config_clock_source_get(void)
 #endif
 }
 
-#if CONFIG_MPSL_FEM_NRF21540_GPIO
+#if IS_ENABLED(CONFIG_MPSL_FEM_NRF21540_GPIO)
 static int fem_nrf21540_gpio_configure(void)
 {
 	/* FEM configuration requires gpiote and ppi channels.
@@ -189,9 +189,20 @@ static int fem_nrf21540_gpio_configure(void)
 }
 #endif
 
-#if CONFIG_MPSL_FEM_SKY66112_11
+#if IS_ENABLED(CONFIG_MPSL_FEM_SKY66112_11)
 static int fem_sky66112_11_configure(void)
 {
+	/* FEM configuration requires gpiote and ppi channels.
+	 * Currently there is no reliable common method to dynamically
+	 * allocate such channels. FEM module needs only "some" channels
+	 * to use whichever they are, but FEM needs them for exclusive use
+	 * and does not enable them immediately.
+	 *
+	 * When common api to assign gpiote and ppi channels is available
+	 * current solution based on macros coming from Kconfig should be
+	 * reworked.
+	 */
+
 #if !DT_NODE_EXISTS(DT_NODELABEL(nrf_radio_fem))
 #error Node with label 'nrf_radio_fem' not found in the devicetree.
 #endif
@@ -233,11 +244,11 @@ static int fem_configure(void)
 {
 	int err = 0;
 
-#if CONFIG_MPSL_FEM_NRF21540_GPIO
+#if IS_ENABLED(CONFIG_MPSL_FEM_NRF21540_GPIO)
 	err = fem_nrf21540_gpio_configure();
-#elif CONFIG_MPSL_FEM_SKY66112_11
+#elif IS_ENABLED(CONFIG_MPSL_FEM_SKY66112_11)
 	err = fem_sky66112_11_configure();
-#elif CONFIG_MPSL_FEM
+#elif IS_ENABLED(CONFIG_MPSL_FEM)
 #error Incomplete CONFIG_MPSL_FEM configuration. No supported FEM type found.
 #else
 	/* No FEM in use */
@@ -282,12 +293,12 @@ static int mpsl_lib_init(const struct device *dev)
 			   mpsl_rtc0_isr_wrapper, IRQ_ZERO_LATENCY);
 	IRQ_DIRECT_CONNECT(RADIO_IRQn, MPSL_HIGH_IRQ_PRIORITY,
 			   mpsl_radio_isr_wrapper, IRQ_ZERO_LATENCY);
-
+// #if IS_ENABLED(CONFIG_MPSL_FEM) // ?? TODO: is better with it ?
 	err = fem_configure();
 	if (err) {
 		return err;
 	}
-
+// #endif
 	return 0;
 }
 
