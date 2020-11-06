@@ -240,6 +240,7 @@ static int fem_sky66112_11_configure(void)
 }
 #endif
 
+#if IS_ENABLED(CONFIG_MPSL_FEM)
 static int fem_configure(void)
 {
 	int err = 0;
@@ -248,14 +249,13 @@ static int fem_configure(void)
 	err = fem_nrf21540_gpio_configure();
 #elif IS_ENABLED(CONFIG_MPSL_FEM_SKY66112_11)
 	err = fem_sky66112_11_configure();
-#elif IS_ENABLED(CONFIG_MPSL_FEM)
-#error Incomplete CONFIG_MPSL_FEM configuration. No supported FEM type found.
 #else
-	/* No FEM in use */
+#error Incomplete CONFIG_MPSL_FEM configuration. No supported FEM type found.
 #endif
 
 	return err;
 }
+#endif
 
 static int mpsl_lib_init(const struct device *dev)
 {
@@ -293,12 +293,14 @@ static int mpsl_lib_init(const struct device *dev)
 			   mpsl_rtc0_isr_wrapper, IRQ_ZERO_LATENCY);
 	IRQ_DIRECT_CONNECT(RADIO_IRQn, MPSL_HIGH_IRQ_PRIORITY,
 			   mpsl_radio_isr_wrapper, IRQ_ZERO_LATENCY);
-// #if IS_ENABLED(CONFIG_MPSL_FEM) // ?? TODO: is better with it ?
+
+#if IS_ENABLED(CONFIG_MPSL_FEM)
 	err = fem_configure();
 	if (err) {
 		return err;
 	}
-// #endif
+#endif
+
 	return 0;
 }
 

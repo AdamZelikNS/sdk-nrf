@@ -45,6 +45,9 @@ For more information about this device, see the `nRF21540`_ documentation.
 
 The nRF21540 GPIO mode implementation of FEM is compatible with this device and implements the 3-pin PA/LNA interface.
 
+.. note::
+  In the naming convention used in the API of the MPSL library, the functionalities designated as ``PA`` and ``LNA`` applies to the ``tx-en-pin`` and ``rx-en-pin`` pins listed below, respectively.
+
 To use nRF21540 in GPIO mode, complete the following steps:
 
 1. Add the following node in the Devicetree file:
@@ -69,9 +72,6 @@ To use nRF21540 in GPIO mode, complete the following steps:
 
    These properties correspond to ``TX_EN``, ``RX_EN``, and ``PDN`` pins of nRF21540 that are supported by software FEM.
    State of other control pins should be set by other means and according to `nRF21540 Objective Product Specification`_.
-   
-   In the naming convention used in the API of the MPSL library, the functionalities designated as ``PA`` and ``LNA`` correspond to the above-mentioned pins ``TX_EN`` and ``RX_EN`` respectively.
-
 #. Set the following Kconfig parameters to assign unique GPIOTE channel numbers to be used exclusively by the FEM driver:
 
    * :option:`MPSL_FEM_NRF21540_GPIO_GPIOTE_TX_EN`
@@ -125,6 +125,9 @@ Adding support for SKY66112-11
 
 SKY66112-11 is one of many FEM devices that support the 2-pin PA/LNA interface.
 
+.. note::
+  In the naming convention used in the API of the MPSL library, the functionalities designated as ``PA`` and ``LNA`` applies to the ``ctx-pin`` and ``crx-pin`` pins listed below, respectively.
+
 To use the Simple GPIO implementation of FEM with SKY66112-11, complete the following steps:
 
 1. Add the following node in the Devicetree file:
@@ -147,8 +150,6 @@ To use the Simple GPIO implementation of FEM with SKY66112-11, complete the foll
    These properties correspond to ``CTX`` and ``CRX`` pins of SKY66112-11 that are supported by software FEM.
    State of other control pins should be set according to SKY66112-11 documentation.
    See the official `SKY66112-11 page`_ for more information.
-
-   In the naming convention used in the API of the MPSL library, the functionalities designated as ``PA`` and ``LNA`` correspond to the above-mentioned pins ``CTX`` and ``CRX`` respectively.
 #. Set the following Kconfig parameters to assign unique GPIOTE channel numbers to be used exclusively by the FEM driver:
 
    * :option:`MPSL_FEM_SKY66112_11_GPIOTE_CTX`
