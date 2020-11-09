@@ -16,6 +16,8 @@ These methods are only available to protocol drivers that are using FEM features
 They are also valid for cases where an application uses just one protocol, but benefits from features provided by MPSL.
 To avoid conflicts, check the protocol documentation to see if it uses FEM support provided by MPSL.
 
+Work is underway to make the protocols shipped with |NCS| use FEM, but none of them currently have this feature.
+
 |NCS| provides a friendly wrapper that configures FEM based on Devicetree (DTS) and Kconfig information.
 To enable FEM support, you must enable FEM and MPSL, and add an ``nrf_radio_fem`` node in the Devicetree file.
 The node can also be provided by the target board Devicetree file or by an overlay file.
@@ -42,6 +44,9 @@ The nRF21540 device is a range extender that can be used with the nRF52 and nRF5
 For more information about this device, see the `nRF21540`_ documentation.
 
 The nRF21540 GPIO mode implementation of FEM is compatible with this device and implements the 3-pin PA/LNA interface.
+
+.. note::
+  In the naming convention used in the API of the MPSL library, the functionalities designated as ``PA`` and ``LNA`` applies to the ``tx-en-pin`` and ``rx-en-pin`` pins listed below, respectively.
 
 To use nRF21540 in GPIO mode, complete the following steps:
 
@@ -120,6 +125,9 @@ Adding support for SKY66112-11
 
 SKY66112-11 is one of many FEM devices that support the 2-pin PA/LNA interface.
 
+.. note::
+  In the naming convention used in the API of the MPSL library, the functionalities designated as ``PA`` and ``LNA`` applies to the ``ctx-pin`` and ``crx-pin`` pins listed below, respectively.
+
 To use the Simple GPIO implementation of FEM with SKY66112-11, complete the following steps:
 
 1. Add the following node in the Devicetree file:
@@ -136,8 +144,8 @@ To use the Simple GPIO implementation of FEM with SKY66112-11, complete the foll
 
 #. Replace the pin numbers provided for each of the required properties:
 
-   * ``ctx-en-pin`` - Pin number of a device that controls the ``CTX`` signal of SKY66112-11.
-   * ``crx-en-pin`` - Pin number of a device that controls the ``CRX`` signal of SKY66112-11.
+   * ``ctx-pin`` - Pin number of a device that controls the ``CTX`` signal of SKY66112-11.
+   * ``crx-pin`` - Pin number of a device that controls the ``CRX`` signal of SKY66112-11.
 
    These properties correspond to ``CTX`` and ``CRX`` pins of SKY66112-11 that are supported by software FEM.
    State of other control pins should be set according to SKY66112-11 documentation.
