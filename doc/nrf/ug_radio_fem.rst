@@ -4,7 +4,7 @@ Radio Front-end Module (FEM) support
 ####################################
 
 |NCS| allows you to extend the radio range of your board with an implementation of the Front-End Modules (FEM).
-The FEM support is based on the :ref:`nrfxlib:mpsl_fem`, which is integrated in nrfxlib's MPSL library.
+The FEM support is based on the :ref:`nrfxlib:mpsl_fem`, which is integrated in the nrfxlib's MPSL library.
 This library provides nRF21540 GPIO and Simple GPIO implementations, for 3-pin and 2-pin PA/LNA interfaces, respectively.
 
 This guide describes how to add support for these FEM implementations to your application in |NCS|:
@@ -46,7 +46,7 @@ For more information about this device, see the `nRF21540`_ documentation.
 The nRF21540 GPIO mode implementation of FEM is compatible with this device and implements the 3-pin PA/LNA interface.
 
 .. note::
-  In the naming convention used in the API of the MPSL library, the functionalities designated as ``PA`` and ``LNA`` applies to the ``tx-en-pin`` and ``rx-en-pin`` pins listed below, respectively.
+  In the naming convention used in the API of the MPSL library, the functionalities designated as ``PA`` and ``LNA`` apply to the ``tx-en-pin`` and ``rx-en-pin`` pins listed below, respectively.
 
 To use nRF21540 in GPIO mode, complete the following steps:
 
@@ -71,7 +71,7 @@ To use nRF21540 in GPIO mode, complete the following steps:
    * ``pdn-pin`` - Pin number of the device that controls the ``PDN`` signal of nRF21540.
 
    These properties correspond to ``TX_EN``, ``RX_EN``, and ``PDN`` pins of nRF21540 that are supported by software FEM.
-   State of other control pins should be set by other means and according to `nRF21540 Objective Product Specification`_.
+   The state of the remaining control pins should be set in other ways and according to `nRF21540 Objective Product Specification`_.
 #. Set the following Kconfig parameters to assign unique GPIOTE channel numbers to be used exclusively by the FEM driver:
 
    * :option:`MPSL_FEM_NRF21540_GPIO_GPIOTE_TX_EN`
@@ -91,8 +91,8 @@ The following properties are optional and can be added to the Devicetree node if
 
 * Properties that control the timing of interface signals:
 
-  * ``tx-en-settle-time-us`` - Minimal time interval between asserting the ``TX_EN`` signal and start of the radio transmission, in microseconds.
-  * ``rx-en-settle-time-us`` - Minimal time interval between asserting the ``RX_EN`` signal and start of the radio transmission, in microseconds.
+  * ``tx-en-settle-time-us`` - Minimal time interval between asserting the ``TX_EN`` signal and starting the radio transmission, in microseconds.
+  * ``rx-en-settle-time-us`` - Minimal time interval between asserting the ``RX_EN`` signal and starting the radio transmission, in microseconds.
 
     .. important::
         Values for these two properties cannot be higher than the Radio Ramp-Up time defined by :c:macro:`TX_RAMP_UP_TIME` and :c:macro:`RX_RAMP_UP_TIME`.
@@ -126,7 +126,7 @@ Adding support for SKY66112-11
 SKY66112-11 is one of many FEM devices that support the 2-pin PA/LNA interface.
 
 .. note::
-  In the naming convention used in the API of the MPSL library, the functionalities designated as ``PA`` and ``LNA`` applies to the ``ctx-pin`` and ``crx-pin`` pins listed below, respectively.
+  In the naming convention used in the API of the MPSL library, the functionalities designated as ``PA`` and ``LNA`` apply to the ``ctx-pin`` and ``crx-pin`` pins listed below, respectively.
 
 To use the Simple GPIO implementation of FEM with SKY66112-11, complete the following steps:
 
@@ -148,7 +148,7 @@ To use the Simple GPIO implementation of FEM with SKY66112-11, complete the foll
    * ``crx-pin`` - Pin number of a device that controls the ``CRX`` signal of SKY66112-11.
 
    These properties correspond to ``CTX`` and ``CRX`` pins of SKY66112-11 that are supported by software FEM.
-   State of other control pins should be set according to SKY66112-11 documentation.
+   The state of the other control pins should be set according to the SKY66112-11 documentation.
    See the official `SKY66112-11 page`_ for more information.
 #. Set the following Kconfig parameters to assign unique GPIOTE channel numbers to be used exclusively by the FEM driver:
 
@@ -167,8 +167,8 @@ The following properties are optional and can be added to the Devicetree node if
 
 * Properties that control the timing of interface signals:
 
-  * ``ctx-settle-time-us`` - Minimal time interval between asserting the ``CTX`` signal and start of the radio transmission, in microseconds.
-  * ``crx-settle-time-us`` - Minimal time interval between asserting the ``CRX`` signal and start of the radio transmission, in microseconds.
+  * ``ctx-settle-time-us`` - Minimal time interval between asserting the ``CTX`` signal and starting the radio transmission, in microseconds.
+  * ``crx-settle-time-us`` - Minimal time interval between asserting the ``CRX`` signal and starting the radio transmission, in microseconds.
 
   The default values of these properties are appropriate for default hardware and most use cases.
   You can override them if you need additional capacitors, for example when using custom hardware.
@@ -183,4 +183,4 @@ The following properties are optional and can be added to the Devicetree node if
   * ``tx-gain-db`` - Transmission gain value in dB.
   * ``rx-gain-db`` - Reception gain value in dB.
 
-  The default values are accurate for SKY66112-11, but can be overridden when using similar device with different gain.
+  The default values are accurate for SKY66112-11 but can be overridden when using a similar device with a different gain.
