@@ -13,20 +13,35 @@ compatible: "nordic,nrf21540_gpio"
 include: base.yaml
 
 properties:
-    tx-en-pin:
-        type: int
+    tx-en-gpios:
+        type: phandle-array
         description: >
-            Pin number of the SOC controlling TX_EN pin of the nRF21540
+            Gpio of the SOC controlling TX_EN pin of the nRF21540
 
-    rx-en-pin:
-        type: int
+    tx-en-gpio-is-not-used:
+        type: boolean
         description: >
-            Pin number of the SOC controlling RX_EN pin of the nRFf21540
+            This flag should be present in case pin control is not required and pin is not assigned
 
-    pdn-pin:
-        type: int
+    rx-en-gpios:
+        type: phandle-array
         description: >
-            Pin number of the SOC controlling PDN pin of the nRF21540
+            Gpio of the SOC controlling RX_EN pin of the nRFf21540
+
+    rx-en-gpio-is-not-used:
+        type: boolean
+        description: >
+            This flag should be present in case pin control is not required and pin is not assigned
+
+    pdn-gpios:
+        type: phandle-array
+        description: >
+            Gpio of the SOC controlling PDN pin of the nRF21540
+
+    pdn-gpio-is-not-used:
+        type: boolean
+        description: >
+            This flag should be present in case pin control is not required and pin is not assigned
 
     tx-en-settle-time-us:
         type: int
