@@ -5,6 +5,7 @@
  */
 
 #include <devicetree.h>
+#include <drivers/gpio.h>
 #include <init.h>
 #include <irq.h>
 #include <kernel.h>
@@ -130,6 +131,21 @@ static uint8_t m_config_clock_source_get(void)
 #endif
 }
 
+#if IS_ENABLED(CONFIG_MPSL_FEM)
+
+#define MPSL_FEM_NRF21540_GPIO_POLARITY_GET(dt_property) \
+	((DT_GPIO_FLAGS(DT_NODELABEL(nrf_radio_fem), dt_property) & GPIO_ACTIVE_LOW) ? false : true)
+
+#define MPSL_FEM_GPIO_INVALID_PIN        0xFFU
+#define MPSL_FEM_GPIOTE_INVALID_CHANNEL  0xFFU
+#define MPSL_FEM_DISABLED_GPIO_CONFIG_INIT \
+	.enable       = false, \
+	.active_high  = true, \
+	.gpio_pin     = MPSL_FEM_GPIO_INVALID_PIN, \
+	.gpiote_ch_id = MPSL_FEM_GPIOTE_INVALID_CHANNEL
+
+#endif
+
 #if IS_ENABLED(CONFIG_MPSL_FEM_NRF21540_GPIO)
 static int fem_nrf21540_gpio_configure(void)
 {
@@ -164,22 +180,40 @@ static int fem_nrf21540_gpio_configure(void)
 				DT_PROP(DT_NODELABEL(nrf_radio_fem), rx_gain_db)
 		},
 		.pa_pin_config = {
+#if DT_NODE_HAS_PROP(DT_NODELABEL(nrf_radio_fem), tx_en_gpios)
 			.enable       = true,
-			.active_high  = true,
-			.gpio_pin     = DT_PROP(DT_NODELABEL(nrf_radio_fem), tx_en_pin),
+			.active_high  = MPSL_FEM_NRF21540_GPIO_POLARITY_GET(tx_en_gpios),
+			.gpio_pin     = DT_GPIO_PIN(DT_NODELABEL(nrf_radio_fem), tx_en_gpios),
 			.gpiote_ch_id = CONFIG_MPSL_FEM_NRF21540_GPIO_GPIOTE_TX_EN
+#elif DT_PROP(DT_NODELABEL(nrf_radio_fem), tx_en_gpio_is_not_used) == 1
+			MPSL_FEM_DISABLED_GPIO_CONFIG_INIT
+#else
+#error Property 'tx-en-gpios' of DT node 'nrf_radio_fem' is missing
+#endif
 		},
 		.lna_pin_config = {
+#if DT_NODE_HAS_PROP(DT_NODELABEL(nrf_radio_fem), rx_en_gpios)
 			.enable       = true,
-			.active_high  = true,
-			.gpio_pin     = DT_PROP(DT_NODELABEL(nrf_radio_fem), rx_en_pin),
+			.active_high  = MPSL_FEM_NRF21540_GPIO_POLARITY_GET(rx_en_gpios),
+			.gpio_pin     = DT_GPIO_PIN(DT_NODELABEL(nrf_radio_fem), rx_en_gpios),
 			.gpiote_ch_id = CONFIG_MPSL_FEM_NRF21540_GPIO_GPIOTE_RX_EN
+#elif DT_PROP(DT_NODELABEL(nrf_radio_fem), rx_en_gpio_is_not_used) == 1
+			MPSL_FEM_DISABLED_GPIO_CONFIG_INIT
+#else
+#error Property 'rx-en-gpios' of DT node 'nrf_radio_fem' is missing
+#endif
 		},
 		.pdn_pin_config = {
+#if DT_NODE_HAS_PROP(DT_NODELABEL(nrf_radio_fem), pdn_gpios)
 			.enable       = true,
-			.active_high  = true,
-			.gpio_pin     = DT_PROP(DT_NODELABEL(nrf_radio_fem), pdn_pin),
+			.active_high  = MPSL_FEM_NRF21540_GPIO_POLARITY_GET(pdn_gpios),
+			.gpio_pin     = DT_GPIO_PIN(DT_NODELABEL(nrf_radio_fem), pdn_gpios),
 			.gpiote_ch_id = CONFIG_MPSL_FEM_NRF21540_GPIO_GPIOTE_PDN
+#elif DT_PROP(DT_NODELABEL(nrf_radio_fem), pdn_gpio_is_not_used) == 1
+			MPSL_FEM_DISABLED_GPIO_CONFIG_INIT
+#else
+#error Property 'pdn-gpios' of DT node 'nrf_radio_fem' is missing
+#endif
 		},
 		.ppi_channels = {
 			CONFIG_MPSL_FEM_NRF21540_GPIO_PPI_CHANNEL_0,
@@ -222,16 +256,28 @@ static int fem_sky66112_11_configure(void)
 				DT_PROP(DT_NODELABEL(nrf_radio_fem), rx_gain_db)
 		},
 		.pa_pin_config = {
+#if DT_NODE_HAS_PROP(DT_NODELABEL(nrf_radio_fem), ctx_gpios)
 			.enable       = true,
-			.active_high  = true,
-			.gpio_pin     = DT_PROP(DT_NODELABEL(nrf_radio_fem), ctx_pin),
+			.active_high  = MPSL_FEM_NRF21540_GPIO_POLARITY_GET(ctx_gpios),
+			.gpio_pin     = DT_GPIO_PIN(DT_NODELABEL(nrf_radio_fem), ctx_gpios),
 			.gpiote_ch_id = CONFIG_MPSL_FEM_SKY66112_11_GPIOTE_CTX
+#elif DT_PROP(DT_NODELABEL(nrf_radio_fem), ctx_gpio_is_not_used) == 1
+			MPSL_FEM_DISABLED_GPIO_CONFIG_INIT
+#else
+#error Property 'ctx-gpios' of DT node 'nrf_radio_fem' is missing
+#endif
 		},
 		.lna_pin_config = {
+#if DT_NODE_HAS_PROP(DT_NODELABEL(nrf_radio_fem), crx_gpios)
 			.enable       = true,
-			.active_high  = true,
-			.gpio_pin     = DT_PROP(DT_NODELABEL(nrf_radio_fem), crx_pin),
+			.active_high  = MPSL_FEM_NRF21540_GPIO_POLARITY_GET(crx_gpios),
+			.gpio_pin     = DT_GPIO_PIN(DT_NODELABEL(nrf_radio_fem), crx_gpios),
 			.gpiote_ch_id = CONFIG_MPSL_FEM_SKY66112_11_GPIOTE_CRX
+#elif DT_PROP(DT_NODELABEL(nrf_radio_fem), crx_gpio_is_not_used) == 1
+			MPSL_FEM_DISABLED_GPIO_CONFIG_INIT
+#else
+#error Property 'crx-gpios' of DT node 'nrf_radio_fem' is missing
+#endif
 		},
 		.ppi_channels = {
 			CONFIG_MPSL_FEM_SKY66112_11_PPI_CHANNEL_0,
