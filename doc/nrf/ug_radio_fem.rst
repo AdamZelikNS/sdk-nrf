@@ -3,11 +3,15 @@
 Radio Front-end Module (FEM) support
 ####################################
 
-|NCS| allows you to extend the radio range of your board with an implementation of the Front-End Modules (FEM).
+This guide describes how to add support for 2 different Front-End Modules (FEM) implementations to your application in |NCS|.
+
+|NCS| allows you to extend the radio range of your board with an implementation of the Front-End Modules.
+Front end modules are range extenders, used for boosting the link robustness and link budget of wireless SoCs.
+
 The FEM support is based on the :ref:`nrfxlib:mpsl_fem`, which is integrated in the nrfxlib's MPSL library.
 This library provides nRF21540 GPIO and Simple GPIO implementations, for 3-pin and 2-pin PA/LNA interfaces, respectively.
 
-This guide describes how to add support for these FEM implementations to your application in |NCS|:
+The implementations described in this guide are the following:
 
 * :ref:`ug_radio_fem_nrf21540_gpio` - For the nRF21540 GPIO implementation that uses nRF21540.
 * :ref:`ug_radio_fem_skyworks` - For the Simple GPIO implementation that uses the SKY66112-11 device.
