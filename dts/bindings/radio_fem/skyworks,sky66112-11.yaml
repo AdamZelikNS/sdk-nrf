@@ -14,14 +14,24 @@ include: base.yaml
 
 properties:
     ctx-pin:
-        type: int
+        type: phandle-array
         description: >
-            Pin number of the SOC controlling CTX pin of the SKY66112-11
+            Gpio of the SOC controlling CTX pin of the SKY66112-11
+
+    ctx-gpio-is-not-used:
+        type: boolean
+        description: >
+            This flag should be present in case pin control is not required and pin is not assigned
 
     crx-pin:
-        type: int
+        type: phandle-array
         description: >
-            Pin number of the SOC controlling CRX pin of the SKY66112-11
+            Gpio of the SOC controlling CRX pin of the SKY66112-11
+
+    crx-gpio-is-not-used:
+        type: boolean
+        description: >
+            This flag should be present in case pin control is not required and pin is not assigned
 
     ctx-settle-time-us:
         type: int
