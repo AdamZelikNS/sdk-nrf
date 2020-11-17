@@ -87,7 +87,7 @@
 
 .. _`nRF52840 Product Specification`: https://infocenter.nordicsemi.com/topic/ps_nrf52840/keyfeatures_html5.html
 
-.. _`nRF21540 Objective Product Specification`: https://infocenter.nordicsemi.com/topic/ps_nrf21540/keyfeatures_html5.html
+.. _`nRF21540 Product Specification`: https://infocenter.nordicsemi.com/topic/struct_fem/struct/nrf21540_ps.html
 
 .. _`nRF21540`: https://infocenter.nordicsemi.com/topic/struct_fem/struct/nrf21540.html
 

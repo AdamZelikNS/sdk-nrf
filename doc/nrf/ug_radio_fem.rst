@@ -50,7 +50,7 @@ For more information about this device, see the `nRF21540`_ documentation.
 The nRF21540 GPIO mode implementation of FEM is compatible with this device and implements the 3-pin PA/LNA interface.
 
 .. note::
-  In the naming convention used in the API of the MPSL library, the functionalities designated as ``PA`` and ``LNA`` apply to the ``tx-en-pin`` and ``rx-en-pin`` pins listed below, respectively.
+  In the naming convention used in the API of the MPSL library, the functionalities designated as ``PA`` and ``LNA`` apply to the ``tx-en-gpios`` and ``rx-en-gpios`` pins listed below, respectively.
 
 To use nRF21540 in GPIO mode, complete the following steps:
 
@@ -60,22 +60,28 @@ To use nRF21540 in GPIO mode, complete the following steps:
 
    / {
        nrf_radio_fem: name_of_fem_node {
-           compatible = "nordic,nrf21540_gpio";
-           tx-en-pin  = < 13 >;
-           rx-en-pin  = < 14 >;
-           pdn-pin    = < 15 >;
+           compatible  = "nordic,nrf21540_gpio";
+           tx-en-gpios = <&gpio0 13 GPIO_ACTIVE_HIGH>;
+           rx-en-gpios = <&gpio0 14 GPIO_ACTIVE_HIGH>;
+           pdn-gpios   = <&gpio0 15 GPIO_ACTIVE_HIGH>;
        };
    };
 
 #. Replace the node name ``name_of_fem_node``.
 #. Replace the pin numbers provided for each of the required properties:
 
-   * ``tx-en-pin`` - Pin number of the device that controls the ``TX_EN`` signal of nRF21540.
-   * ``rx-en-pin`` - Pin number of the device that controls the ``RX_EN`` signal of nRF21540.
-   * ``pdn-pin`` - Pin number of the device that controls the ``PDN`` signal of nRF21540.
+   * ``tx-en-gpios`` - GPIO characteristic of the device that controls the ``TX_EN`` signal of nRF21540.
+   * ``rx-en-gpios`` - GPIO characteristic of the device that controls the ``RX_EN`` signal of nRF21540.
+   * ``pdn-gpios`` - GPIO characteristic of the device that controls the ``PDN`` signal of nRF21540.
 
    These properties correspond to ``TX_EN``, ``RX_EN``, and ``PDN`` pins of nRF21540 that are supported by software FEM.
-   The state of the remaining control pins should be set in other ways and according to `nRF21540 Objective Product Specification`_.
+
+   Type ``phandle-array`` is used here, which is common in Zephyr's Devicetree to describe GPIO signals.
+   The first element ``&gpio0`` refers to the GPIO port ("port 0" has been selected in the example shown).
+   The second element is the pin number on that port.
+   The last element must be ``GPIO_ACTIVE_HIGH`` for nRF21540, but for a different FEM module you can use ``GPIO_ACTIVE_LOW``.
+
+   The state of the remaining control pins should be set in other ways and according to `nRF21540 Product Specification`_.
 #. Set the following Kconfig parameters to assign unique GPIOTE channel numbers to be used exclusively by the FEM driver:
 
    * :option:`MPSL_FEM_NRF21540_GPIO_GPIOTE_TX_EN`
@@ -112,7 +118,7 @@ The following properties are optional and can be added to the Devicetree node if
 
   .. note::
     These values have some constraints.
-    For details, see `nRF21540 Objective Product Specification`_.
+    For details, see `nRF21540 Product Specification`_.
 
 * Properties that inform protocol drivers about gains provided by nRF21540:
 
@@ -130,7 +136,7 @@ Adding support for SKY66112-11
 SKY66112-11 is one of many FEM devices that support the 2-pin PA/LNA interface.
 
 .. note::
-  In the naming convention used in the API of the MPSL library, the functionalities designated as ``PA`` and ``LNA`` apply to the ``ctx-pin`` and ``crx-pin`` pins listed below, respectively.
+  In the naming convention used in the API of the MPSL library, the functionalities designated as ``PA`` and ``LNA`` apply to the ``ctx-gpios`` and ``crx-gpios`` pins listed below, respectively.
 
 To use the Simple GPIO implementation of FEM with SKY66112-11, complete the following steps:
 
@@ -141,17 +147,23 @@ To use the Simple GPIO implementation of FEM with SKY66112-11, complete the foll
    / {
        nrf_radio_fem: skyworks_shield {
            compatible = "skyworks,sky66112-11";
-           ctx-pin = < 13 >;
-           crx-pin = < 14 >;
+           ctx-gpios = <&gpio0 13 GPIO_ACTIVE_HIGH>;
+           crx-gpios = <&gpio0 14 GPIO_ACTIVE_HIGH>;
        };
    };
 
 #. Replace the pin numbers provided for each of the required properties:
 
-   * ``ctx-pin`` - Pin number of a device that controls the ``CTX`` signal of SKY66112-11.
-   * ``crx-pin`` - Pin number of a device that controls the ``CRX`` signal of SKY66112-11.
+   * ``ctx-gpios`` - GPIO characteristic of the device that controls the ``CTX`` signal of SKY66112-11.
+   * ``crx-gpios`` - GPIO characteristic of the device that controls the ``CRX`` signal of SKY66112-11.
 
    These properties correspond to ``CTX`` and ``CRX`` pins of SKY66112-11 that are supported by software FEM.
+
+   Type ``phandle-array`` is used here, which is common in Zephyr's Devicetree to describe GPIO signals.
+   The first element ``&gpio0`` refers to the GPIO port ("port 0" has been selected in the example shown).
+   The second element is the pin number on that port.
+   The last element must be ``GPIO_ACTIVE_HIGH`` for SKY66112-11, but for a different FEM module you can use ``GPIO_ACTIVE_LOW``.
+
    The state of the other control pins should be set according to the SKY66112-11 documentation.
    See the official `SKY66112-11 page`_ for more information.
 #. Set the following Kconfig parameters to assign unique GPIOTE channel numbers to be used exclusively by the FEM driver:
@@ -188,3 +200,16 @@ The following properties are optional and can be added to the Devicetree node if
   * ``rx-gain-db`` - Reception gain value in dB.
 
   The default values are accurate for SKY66112-11 but can be overridden when using a similar device with a different gain.
+
+.. _ug_radio_fem_incomplete_connections:
+
+Use case of incomplete physical connections to the FEM module
+*************************************************************
+
+The method of configuring FEM using the Devicetree file allows you to opt out of using some pins.
+For example if power consumption is not critical, the nRF module PDN pin can be connected to a fixed logic level.
+Then there is no need to define a GPIO to control the PDN signal.
+The line ``pdn-gpios = < .. >;`` can then be replaced in the Devicetree file with ``pdn-gpio-is-not-used;``. 
+
+The general rule is as follows: If pin ``X`` is not used, replace ``X-gpios = < .. >;`` with ``X-gpio-is-not-used;``.
+The rule applies to all properties with a ``-gpios`` suffix, for both nRF21540 and SKY66112-11.
