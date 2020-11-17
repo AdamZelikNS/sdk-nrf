@@ -60,7 +60,7 @@ To use nRF21540 in GPIO mode, complete the following steps:
 
    / {
        nrf_radio_fem: name_of_fem_node {
-           compatible  = "nordic,nrf21540_gpio";
+           compatible  = "nordic,nrf21540-fem";
            tx-en-gpios = <&gpio0 13 GPIO_ACTIVE_HIGH>;
            rx-en-gpios = <&gpio0 14 GPIO_ACTIVE_HIGH>;
            pdn-gpios   = <&gpio0 15 GPIO_ACTIVE_HIGH>;

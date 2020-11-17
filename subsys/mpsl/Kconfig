@@ -25,7 +25,7 @@ config MPSL_TIMESLOT_SESSION_COUNT
 	help
 	  Maximum number of timeslot sessions.
 
-DT_COMPAT_NORDIC_NRF21540_GPIO := nordic,nrf21540_gpio
+DT_COMPAT_NORDIC_NRF21540_GPIO := nordic,nrf21540-fem
 DT_COMPAT_SKYWORKS_SKY66112_11 := skyworks,sky66112-11
 
 config CAN_USE_MPSL_FEM_NRF21540_GPIO
