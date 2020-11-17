@@ -207,9 +207,8 @@ Use case of incomplete physical connections to the FEM module
 *************************************************************
 
 The method of configuring FEM using the Devicetree file allows you to opt out of using some pins.
-For example if power consumption is not critical, the nRF module PDN pin can be connected to a fixed logic level.
-Then there is no need to define a GPIO to control the PDN signal.
-The line ``pdn-gpios = < .. >;`` can then be replaced in the Devicetree file with ``pdn-gpio-is-not-used;``. 
+For example if power consumption is not critical, the nRF21540 module PDN pin can be connected to a fixed logic level.
+Then there is no need to define a GPIO to control the PDN signal. The line ``pdn-gpios = < .. >;`` can then be removed from the Devicetree file. 
 
-The general rule is as follows: If pin ``X`` is not used, replace ``X-gpios = < .. >;`` with ``X-gpio-is-not-used;``.
-The rule applies to all properties with a ``-gpios`` suffix, for both nRF21540 and SKY66112-11.
+Generally, if pin ``X`` is not used, the ``X-gpios = < .. >;`` property can be removed.
+This applies to all properties with a ``-gpios`` suffix, for both nRF21540 and SKY66112-11.

@@ -11,33 +11,21 @@ include: base.yaml
 properties:
     tx-en-gpios:
         type: phandle-array
+        required: false
         description: >
             Gpio of the SOC controlling TX_EN pin of the nRF21540
 
-    tx-en-gpio-is-not-used:
-        type: boolean
-        description: >
-            This flag should be present in case pin control is not required and pin is not assigned
-
     rx-en-gpios:
         type: phandle-array
+        required: false
         description: >
             Gpio of the SOC controlling RX_EN pin of the nRF21540
 
-    rx-en-gpio-is-not-used:
-        type: boolean
-        description: >
-            This flag should be present in case pin control is not required and pin is not assigned
-
     pdn-gpios:
         type: phandle-array
+        required: false
         description: >
             Gpio of the SOC controlling PDN pin of the nRF21540
-
-    pdn-gpio-is-not-used:
-        type: boolean
-        description: >
-            This flag should be present in case pin control is not required and pin is not assigned
 
     tx-en-settle-time-us:
         type: int

@@ -9,25 +9,17 @@ compatible: "skyworks,sky66112-11"
 include: base.yaml
 
 properties:
-    ctx-pin:
+    ctx-gpios:
         type: phandle-array
+        required: false
         description: >
             Gpio of the SOC controlling CTX pin of the SKY66112-11
 
-    ctx-gpio-is-not-used:
-        type: boolean
-        description: >
-            This flag should be present in case pin control is not required and pin is not assigned
-
-    crx-pin:
+    crx-gpios:
         type: phandle-array
+        required: false
         description: >
             Gpio of the SOC controlling CRX pin of the SKY66112-11
-
-    crx-gpio-is-not-used:
-        type: boolean
-        description: >
-            This flag should be present in case pin control is not required and pin is not assigned
 
     ctx-settle-time-us:
         type: int
