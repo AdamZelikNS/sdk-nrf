@@ -97,6 +97,15 @@ if (CONFIG_NCS_SAMPLE_EMPTY_APP_CORE_CHILD_IMAGE)
   message("Adding 'empty_app_core' sample as child image since "
     "CONFIG_NCS_SAMPLE_EMPTY_APP_CORE_CHILD_IMAGE is set to 'y'")
 
+  if (CONFIG_NCS_SAMPLE_EMPTY_APP_CORE_CHILD_IMAGE_ENABLE_K32SRC_XTAL)
+    message("~ ~ ~ Cmake : XTAL ~ ~ ~")
+    # TODO: remove debug message above 
+    add_overlay_config(
+      empty_app_core
+      ${NRF_DIR}/samples/nrf5340/empty_app_core/enable_k32sec_xtal.conf
+      )
+  endif()
+
   add_child_image(
     NAME empty_app_core
     SOURCE_DIR ${NRF_DIR}/samples/nrf5340/empty_app_core

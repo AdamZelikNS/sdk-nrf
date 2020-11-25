@@ -24,6 +24,20 @@ config NCS_SAMPLE_EMPTY_APP_CORE_CHILD_IMAGE
 	  Add the empty_app_core as a child image for the given sample.
 	  Used by samples that only require SOC_NRF5340_CPUNET.
 
+config NCS_SAMPLE_EMPTY_APP_CORE_CHILD_IMAGE_ENABLE_K32SRC_XTAL
+	bool "Initialize pins for crystal 32k operation in empty_app_core child image"
+	default n
+	depends on SOC_NRF5340_CPUNET
+	help
+	  TODO - add purpose description
+
+config NCS_SAMPLE_EMPTY_APP_CORE_CHILD_IMAGE_K32SRC_XTAL_ENABLED
+	bool "Initialize pins for crystal 32768Hz operation in empty_app_core sample"
+	default n
+	depends on SOC_NRF5340_CPUAPP
+	help
+	  TODO ~ add purpose description
+
 if LOG
 
 # LOG_DEFAULT_LEVEL is declared in Zephyr,

@@ -53,8 +53,26 @@ static int network_gpio_allow(const struct device *dev)
 {
 	ARG_UNUSED(dev);
 
-	/* Allow Network MCU to use all GPIOs */
-	for (uint32_t i = 0; i < ARRAY_SIZE(NRF_P0_S->PIN_CNF); i++) {
+	uint32_t i_net;
+
+	if (IS_ENABLED(CONFIG_NCS_SAMPLE_EMPTY_APP_CORE_CHILD_IMAGE_K32SRC_XTAL_ENABLED))
+        {
+		const uint32_t pin_XL1_num = 0; /* P0.00 */ // #define PIN_XL1 0
+		const uint32_t pin_XL2_num = 1; /* P0.01 */ // #define PIN_XL2 1
+                
+		NRF_P0_S->PIN_CNF[pin_XL1_num] = (GPIO_PIN_CNF_MCUSEL_Peripheral <<
+						  GPIO_PIN_CNF_MCUSEL_Pos);
+		NRF_P0_S->PIN_CNF[pin_XL2_num] = (GPIO_PIN_CNF_MCUSEL_Peripheral <<
+						  GPIO_PIN_CNF_MCUSEL_Pos);
+		i_net = 2; /* GPIOs from 2 to 31 will be forwarded */
+        }
+        else
+        {
+		i_net = 0; /* GPIOs from 0 to 31 will be forwarded */ 
+        }
+
+	/* Allow Network MCU to use all or most of the GPIOs */
+	for (uint32_t i = i_net; i < ARRAY_SIZE(NRF_P0_S->PIN_CNF); i++) {
 		NRF_P0_S->PIN_CNF[i] = (GPIO_PIN_CNF_MCUSEL_NetworkMCU <<
 					GPIO_PIN_CNF_MCUSEL_Pos);
 	}
@@ -64,7 +82,12 @@ static int network_gpio_allow(const struct device *dev)
 					GPIO_PIN_CNF_MCUSEL_Pos);
 	}
 
-
+/* TODO: Remove debug pragmas below */
+#if IS_ENABLED(CONFIG_NCS_SAMPLE_EMPTY_APP_CORE_CHILD_IMAGE_K32SRC_XTAL_ENABLED)
+#pragma message "~ ~ ~ ~ ~ ~ ~ ~ ~ ~ Empty CHILD: XT - Enabled ~ ~ ~ ~ ~ ~ ~ ~ ~ ~"
+#else
+#pragma message "~ ~ ~ ~ ~ ~ ~ ~ ~ ~ Empty CHILD: XT - Disabled ~ ~ ~ ~ ~ ~ ~ ~ ~ ~"
+#endif
 	return 0;
 }
 
