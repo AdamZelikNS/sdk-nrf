@@ -175,9 +175,9 @@ static int fem_nrf21540_gpio_configure(void)
 			.trx_hold_us     =
 				DT_PROP(DT_NODELABEL(nrf_radio_fem), trx_hold_time_us),
 			.pa_gain_db      =
-				DT_PROP(DT_NODELABEL(nrf_radio_fem), tx_gain_db),
+				CONFIG_MPSL_FEM_NRF21540_TX_GAIN_DB,
 			.lna_gain_db     =
-				DT_PROP(DT_NODELABEL(nrf_radio_fem), rx_gain_db)
+				CONFIG_MPSL_FEM_NRF21540_RX_GAIN_DB
 		},
 		.pa_pin_config = {
 #if DT_NODE_HAS_PROP(DT_NODELABEL(nrf_radio_fem), tx_en_gpios)

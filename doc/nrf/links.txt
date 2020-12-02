@@ -309,6 +309,8 @@
 
 .. _`AWS IoT Just-in-time-provisioning`: https://aws.amazon.com/blogs/iot/just-in-time-registration-of-device-certificates-on-aws-iot/
 
+.. _`SKY66112-11 page`: https://www.skyworksinc.com/en/Products/Front-end-Modules/SKY66112-11
+
 
 .. ### Links to Bluetooth specs
 

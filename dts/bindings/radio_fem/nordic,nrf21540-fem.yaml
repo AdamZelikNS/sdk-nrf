@@ -27,38 +27,44 @@ properties:
         description: >
             Gpio of the SOC controlling PDN pin of the nRF21540
 
+    ant-sel-gpios:
+        type: phandle-array
+        required: false
+        description: >
+            Gpio of the SOC controlling ANT-SEL pin of the nRF21540
+
     tx-en-settle-time-us:
         type: int
-        default: 10
+        default: 11
         description: >
-            Settling time in microseconds from state PG to TX
+            Settling time in microseconds from state PG to TX.
+
+            Default value is based on Table 6 of the nRF21540 Product Specification (v1.0),
+            and can be overridden for tuned configurations.
 
     rx-en-settle-time-us:
         type: int
-        default: 10
+        default: 11
         description: >
-            Settling time in microseconds from state PG to RX
+            Settling time in microseconds from state PG to RX.
+
+            Default value is based on Table 6 of the nRF21540 Product Specification (v1.0),
+            and can be overridden for tuned configurations.
 
     pdn-settle-time-us:
         type: int
-        default: 17
+        default: 18
         description: >
-            Settling time in microseconds from state PD to PG
+            Settling time in microseconds from state PD to PG.
+
+            Default value is based on Table 6 of the nRF21540 Product Specification (v1.0),
+            and can be overridden for tuned configurations.
 
     trx-hold-time-us:
         type: int
         default: 3
         description: >
-            Power-off time in microseconds when changing from RX or TX to PG
+            Power-off time in microseconds when changing from RX or TX to PG.
 
-    tx-gain-db:
-        type: int
-        default: 20
-        description: >
-            TX gain of the nRF21540 PA amplifier in dB.
-
-    rx-gain-db:
-        type: int
-        default: 20
-        description: >
-            RX gain of the nRF21540 LNA amplifier in dB.
+            Default value is based on Table 6 of the nRF21540 Product Specification (v1.0),
+            and can be overridden for tuned configurations.

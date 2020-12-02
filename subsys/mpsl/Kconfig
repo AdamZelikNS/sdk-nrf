@@ -28,19 +28,19 @@ config MPSL_TIMESLOT_SESSION_COUNT
 DT_COMPAT_NORDIC_NRF21540_GPIO := nordic,nrf21540-fem
 DT_COMPAT_SKYWORKS_SKY66112_11 := skyworks,sky66112-11
 
-config CAN_USE_MPSL_FEM_NRF21540_GPIO
+config MPSL_FEM_NRF21540_GPIO_SUPPORT
 	bool
 	default $(dt_nodelabel_has_compat,nrf_radio_fem,$(DT_COMPAT_NORDIC_NRF21540_GPIO)) && !BT
 
-config CAN_USE_MPSL_FEM_SKY66112_11
+config MPSL_FEM_SKY66112_11_SUPPORT
 	bool
 	default $(dt_nodelabel_has_compat,nrf_radio_fem,$(DT_COMPAT_SKYWORKS_SKY66112_11))
 
 config MPSL_FEM
 	bool "Radio front-end module (FEM) support"
 # MPSL FEM is not supported on 53 yet
-	depends on !(SOC_NRF5340_CPUAPP || SOC_NRF5340_CPUNET)
-	default CAN_USE_MPSL_FEM_NRF21540_GPIO || CAN_USE_MPSL_FEM_SKY66112_11
+	depends on !(SOC_NRF5340_CPUAPP || SOC_NRF5340_CPUNET) && \
+	           (MPSL_FEM_NRF21540_GPIO_SUPPORT || MPSL_FEM_SKY66112_11_SUPPORT)
 	help
 	  Controls if front-end module (FEM) it to be configured automatically
 	  when MPSL is initialized. Default value and type of FEM to use
@@ -50,16 +50,15 @@ if MPSL_FEM
 
 choice MPSL_FEM_CHOICE
 	prompt "Radio front-end module (FEM) type"
-	default MPSL_FEM_NRF21540_GPIO if CAN_USE_MPSL_FEM_NRF21540_GPIO
-	default MPSL_FEM_SKY66112_11 if CAN_USE_MPSL_FEM_SKY66112_11
 
 config MPSL_FEM_NRF21540_GPIO
-	depends on !BT
+	depends on MPSL_FEM_NRF21540_GPIO_SUPPORT
 	bool "nRF21540 front-end module in GPIO mode"
 	help
-	  nRF21540 is unavailable when BLE is enabled
+	  Note: nRF21540 is unavailable when Bluetooth LE is enabled
 
 config MPSL_FEM_SKY66112_11
+	depends on MPSL_FEM_SKY66112_11_SUPPORT
 	bool "SKY66112-11 front-end module"
 
 endchoice	# MPSL_FEM_CHOICE
@@ -89,6 +88,19 @@ config MPSL_FEM_NRF21540_GPIO_PPI_CHANNEL_1
 config MPSL_FEM_NRF21540_GPIO_PPI_CHANNEL_2
 	int "PPI channel reserved for the front-end module"
 	default 5
+
+config MPSL_FEM_NRF21540_TX_GAIN_DB
+	int "TX gain of the nRF21540 PA amplifier in dB"
+	default 20
+	help
+	  The default value of 20 dB is based on nRF21540 Product Specification (v1.0)
+	  and it corresponds to the configuration in which the pin MODE=0 and pin POUTA_SEL=0
+
+config MPSL_FEM_NRF21540_RX_GAIN_DB
+	int "RX gain of the nRF21540 LNA amplifier in dB"
+	default 13
+	help
+	  The default value of 13 dB is based on nRF21540 Product Specification (v1.0)
 
 endif
 

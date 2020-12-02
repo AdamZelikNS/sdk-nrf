@@ -120,14 +120,6 @@ The following properties are optional and can be added to the Devicetree node if
     These values have some constraints.
     For details, see `nRF21540 Product Specification`_.
 
-* Properties that inform protocol drivers about gains provided by nRF21540:
-
-  * ``tx-gain-db`` - Transmission gain value in dB.
-  * ``rx-gain-db`` - Reception gain value in dB.
-
-  .. note::
-        These properties are not currently implemented.
-
 .. _ug_radio_fem_skyworks:
 
 Adding support for SKY66112-11
@@ -208,7 +200,7 @@ Use case of incomplete physical connections to the FEM module
 
 The method of configuring FEM using the Devicetree file allows you to opt out of using some pins.
 For example if power consumption is not critical, the nRF21540 module PDN pin can be connected to a fixed logic level.
-Then there is no need to define a GPIO to control the PDN signal. The line ``pdn-gpios = < .. >;`` can then be removed from the Devicetree file. 
+Then there is no need to define a GPIO to control the PDN signal. The line ``pdn-gpios = < .. >;`` can then be removed from the Devicetree file.
 
 Generally, if pin ``X`` is not used, the ``X-gpios = < .. >;`` property can be removed.
 This applies to all properties with a ``-gpios`` suffix, for both nRF21540 and SKY66112-11.
