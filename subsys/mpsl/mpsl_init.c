@@ -10,6 +10,7 @@
 #include <irq.h>
 #include <kernel.h>
 #include <logging/log.h>
+#include <string.h>
 #include <sys/__assert.h>
 #include <mpsl.h>
 #include <mpsl_timeslot.h>
@@ -144,7 +145,38 @@ static uint8_t m_config_clock_source_get(void)
 	.gpio_pin     = MPSL_FEM_GPIO_INVALID_PIN, \
 	.gpiote_ch_id = MPSL_FEM_GPIOTE_INVALID_CHANNEL
 
+static void fem_pin_num_correction(uint8_t * p_gpio_pin, const char * gpio_lbl)
+{
+	(void)p_gpio_pin;
+
+	/* The pin numbering in the FEM configuration API follows the
+	 * convention:
+	 *   pin numbers 0..31 correspond to the gpio0 port
+	 *   pin numbers 32..63 correspond to the gpio1 port
+	 *
+	 * Values obtained from devicetree are here adjusted to the ranges
+	 * given above.
+	 */
+
+#if DT_NODE_HAS_STATUS(DT_NODELABEL(gpio0), okay)
+	if (strcmp(gpio_lbl, DT_LABEL(DT_NODELABEL(gpio0))) == 0)
+	{
+		return;
+	}
 #endif
+
+#if DT_NODE_HAS_STATUS(DT_NODELABEL(gpio1), okay)
+	if (strcmp(gpio_lbl, DT_LABEL(DT_NODELABEL(gpio1))) == 0)
+	{
+		*p_gpio_pin += 32;
+		return;
+	}
+#endif
+
+	__ASSERT(false, "Unknown GPIO port DT label");
+}
+
+#endif /* IS_ENABLED(CONFIG_MPSL_FEM) */
 
 #if IS_ENABLED(CONFIG_MPSL_FEM_NRF21540_GPIO)
 static int fem_nrf21540_gpio_configure(void)
@@ -215,6 +247,21 @@ static int fem_nrf21540_gpio_configure(void)
 			CONFIG_MPSL_FEM_NRF21540_GPIO_PPI_CHANNEL_2
 		}
 	};
+
+#if DT_NODE_HAS_PROP(DT_NODELABEL(nrf_radio_fem), tx_en_gpios)
+	fem_pin_num_correction(&cfg.pa_pin_config.gpio_pin,
+			       DT_GPIO_LABEL(DT_NODELABEL(nrf_radio_fem), tx_en_gpios));
+#endif
+
+#if DT_NODE_HAS_PROP(DT_NODELABEL(nrf_radio_fem), rx_en_gpios)
+	fem_pin_num_correction(&cfg.lna_pin_config.gpio_pin,
+			       DT_GPIO_LABEL(DT_NODELABEL(nrf_radio_fem), rx_en_gpios));
+#endif
+
+#if DT_NODE_HAS_PROP(DT_NODELABEL(nrf_radio_fem), pdn_gpios)
+	fem_pin_num_correction(&cfg.pdn_pin_config.gpio_pin,
+			       DT_GPIO_LABEL(DT_NODELABEL(nrf_radio_fem), pdn_gpios));
+#endif
 
 	return mpsl_fem_nrf21540_gpio_interface_config_set(&cfg);
 }
