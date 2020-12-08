@@ -84,15 +84,15 @@ To use nRF21540 in GPIO mode, complete the following steps:
    The state of the remaining control pins should be set in other ways and according to `nRF21540 Product Specification`_.
 #. Set the following Kconfig parameters to assign unique GPIOTE channel numbers to be used exclusively by the FEM driver:
 
-   * :option:`MPSL_FEM_NRF21540_GPIO_GPIOTE_TX_EN`
-   * :option:`MPSL_FEM_NRF21540_GPIO_GPIOTE_RX_EN`
-   * :option:`MPSL_FEM_NRF21540_GPIO_GPIOTE_PDN`
+   * :option:`CONFIG_MPSL_FEM_NRF21540_GPIO_GPIOTE_TX_EN`
+   * :option:`CONFIG_MPSL_FEM_NRF21540_GPIO_GPIOTE_RX_EN`
+   * :option:`CONFIG_MPSL_FEM_NRF21540_GPIO_GPIOTE_PDN`
 
 #. Set the following Kconfig parameters to assign unique PPI channel numbers to be used exclusively by the FEM driver:
 
-   * :option:`MPSL_FEM_NRF21540_GPIO_PPI_CHANNEL_0`
-   * :option:`MPSL_FEM_NRF21540_GPIO_PPI_CHANNEL_1`
-   * :option:`MPSL_FEM_NRF21540_GPIO_PPI_CHANNEL_2`
+   * :option:`CONFIG_MPSL_FEM_NRF21540_GPIO_PPI_CHANNEL_0`
+   * :option:`CONFIG_MPSL_FEM_NRF21540_GPIO_PPI_CHANNEL_1`
+   * :option:`CONFIG_MPSL_FEM_NRF21540_GPIO_PPI_CHANNEL_2`
 
 Optional properties
 ===================
@@ -160,13 +160,13 @@ To use the Simple GPIO implementation of FEM with SKY66112-11, complete the foll
    See the official `SKY66112-11 page`_ for more information.
 #. Set the following Kconfig parameters to assign unique GPIOTE channel numbers to be used exclusively by the FEM driver:
 
-   * :option:`MPSL_FEM_SKY66112_11_GPIOTE_CTX`
-   * :option:`MPSL_FEM_SKY66112_11_GPIOTE_CRX`
+   * :option:`CONFIG_MPSL_FEM_SKY66112_11_GPIOTE_CTX`
+   * :option:`CONFIG_MPSL_FEM_SKY66112_11_GPIOTE_CRX`
 
 #. Set the following Kconfig parameters to assign unique PPI channel numbers to be used exclusively by the FEM driver:
 
-   * :option:`MPSL_FEM_NRF21540_GPIO_PPI_CHANNEL_0`
-   * :option:`MPSL_FEM_NRF21540_GPIO_PPI_CHANNEL_1`
+   * :option:`CONFIG_MPSL_FEM_NRF21540_GPIO_PPI_CHANNEL_0`
+   * :option:`CONFIG_MPSL_FEM_NRF21540_GPIO_PPI_CHANNEL_1`
 
 Optional properties
 ===================
