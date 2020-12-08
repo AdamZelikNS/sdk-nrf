@@ -19,7 +19,8 @@ config MPSL_FEM
 	bool "Radio front-end module (FEM) support"
 # MPSL FEM is not supported on 53 yet
 	depends on !(SOC_NRF5340_CPUAPP || SOC_NRF5340_CPUNET) && \
-	           (MPSL_FEM_NRF21540_GPIO_SUPPORT || MPSL_FEM_SKY66112_11_SUPPORT)
+		   (MPSL_FEM_NRF21540_GPIO_SUPPORT || MPSL_FEM_SKY66112_11_SUPPORT)
+	default y
 	help
 	  Controls if front-end module (FEM) is to be configured and enabled
 	  when MPSL is initialized. Default type of FEM to use depends on which
@@ -34,72 +35,108 @@ config MPSL_FEM_NRF21540_GPIO
 	depends on MPSL_FEM_NRF21540_GPIO_SUPPORT
 	bool "nRF21540 front-end module in GPIO mode"
 	help
+	  FEM device is nRF21540 and its control mode is GPIO.
 	  Note: nRF21540 is unavailable when Bluetooth LE is enabled
 
 config MPSL_FEM_SKY66112_11
 	depends on MPSL_FEM_SKY66112_11_SUPPORT
 	bool "SKY66112-11 front-end module"
+	help
+	  FEM device is SKY66112-11 or other device with compatible control
+	  interface.
 
 endchoice	# MPSL_FEM_CHOICE
 
 if MPSL_FEM_NRF21540_GPIO
 
 config MPSL_FEM_NRF21540_GPIO_GPIOTE_TX_EN
-	int "GPIOTE channel number used to control TX_EN pin of the front-end module"
+	int "GPIOTE channel number used to control TX_EN pin"
 	default 7
+	help
+	  Unique GPIOTE channel number to be used exclusively by the FEM driver
+	  for TX_EN pin control.
 
 config MPSL_FEM_NRF21540_GPIO_GPIOTE_RX_EN
-	int "GPIOTE channel number used to control RX_EN pin of the front-end module"
+	int "GPIOTE channel number used to control RX_EN pin"
 	default 6
+	help
+	  Unique GPIOTE channel number to be used exclusively by the FEM driver
+	  for RX_EN pin control.
 
 config MPSL_FEM_NRF21540_GPIO_GPIOTE_PDN
-	int "GPIOTE channel number used to control PDN pin of the front-end module"
+	int "GPIOTE channel number used to control PDN pin"
 	default 5
+	help
+	  Unique GPIOTE channel number to be used exclusively by the FEM driver
+	  for PDN pin control.
 
 config MPSL_FEM_NRF21540_GPIO_PPI_CHANNEL_0
 	int "PPI channel reserved for the front-end module"
 	default 15
+	help
+	  The first of three unique PPI channel numbers to be used exclusively
+	  by the FEM driver.
 
 config MPSL_FEM_NRF21540_GPIO_PPI_CHANNEL_1
 	int "PPI channel reserved for the front-end module"
 	default 16
+	help
+	  The second of three unique PPI channel numbers to be used exclusively
+	  by the FEM driver.
 
 config MPSL_FEM_NRF21540_GPIO_PPI_CHANNEL_2
 	int "PPI channel reserved for the front-end module"
 	default 5
+	help
+	  Third of three unique PPI channel numbers to be used exclusively
+	  by the FEM driver.
 
 config MPSL_FEM_NRF21540_TX_GAIN_DB
 	int "TX gain of the nRF21540 PA amplifier in dB"
 	default 20
 	help
-	  The default value of 20 dB is based on nRF21540 Product Specification (v1.0)
-	  and it corresponds to the configuration in which the pin MODE=0 and pin POUTA_SEL=0
+	  The default value of 20 dB is based on nRF21540 Product Specification
+	  (v1.0) and it corresponds to the configuration in which the pin
+	  MODE=0 and pin POUTA_SEL=0
 
 config MPSL_FEM_NRF21540_RX_GAIN_DB
 	int "RX gain of the nRF21540 LNA amplifier in dB"
 	default 13
 	help
-	  The default value of 13 dB is based on nRF21540 Product Specification (v1.0)
+	  The default value of 13 dB is based on nRF21540 Product Specification
+	  (v1.0)
 
 endif
 
 if MPSL_FEM_SKY66112_11
 
 config MPSL_FEM_SKY66112_11_GPIOTE_CTX
-	int "GPIOTE channel number used to control CTX pin of the front-end module"
+	int "GPIOTE channel number used to control CTX pin"
 	default 7
+	help
+	  Unique GPIOTE channel number to be used exclusively by the FEM driver
+	  for CTX pin control.
 
 config MPSL_FEM_SKY66112_11_GPIOTE_CRX
-	int "GPIOTE channel number used to control CRX pin of the front-end module"
+	int "GPIOTE channel number used to control CRX pin"
 	default 6
+	help
+	  Unique GPIOTE channel number to be used exclusively by the FEM driver
+	  for RTX pin control.
 
 config MPSL_FEM_SKY66112_11_PPI_CHANNEL_0
 	int "PPI channel reserved for the front-end module"
 	default 15
+	help
+	  The first of two unique PPI channel numbers to be used exclusively
+	  by the FEM driver.
 
 config MPSL_FEM_SKY66112_11_PPI_CHANNEL_1
 	int "PPI channel reserved for the front-end module"
 	default 16
+	help
+	  The second of two unique PPI channel numbers to be used exclusively
+	  by the FEM driver.
 
 endif
 

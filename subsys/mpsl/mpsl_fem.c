@@ -6,19 +6,10 @@
 
 #include <devicetree.h>
 #include <drivers/gpio.h>
-#include <init.h>
-#include <irq.h>
-#include <kernel.h>
-#include <logging/log.h>
 #include <string.h>
 #include <sys/__assert.h>
-#include <mpsl.h>
 #include <mpsl_fem_config_nrf21540_gpio.h>
 #include <mpsl_fem_config_simple_gpio.h>
-#include "multithreading_lock.h"
-
-
-// ~!~  #if IS_ENABLED(CONFIG_MPSL_FEM)
 
 #define MPSL_FEM_GPIO_POLARITY_GET(dt_property) \
 	((GPIO_ACTIVE_LOW & \
@@ -61,8 +52,6 @@ static void fem_pin_num_correction(uint8_t *p_gpio_pin, const char *gpio_lbl)
 
 	__ASSERT(false, "Unknown GPIO port DT label");
 }
-
-// ~!~  #endif /* IS_ENABLED(CONFIG_MPSL_FEM) */
 
 #if IS_ENABLED(CONFIG_MPSL_FEM_NRF21540_GPIO)
 static int fem_nrf21540_gpio_configure(void)
@@ -255,7 +244,6 @@ static int fem_sky66112_11_configure(void)
 }
 #endif
 
-// ~!~  #if IS_ENABLED(CONFIG_MPSL_FEM)
 int mpsl_fem_configure(void)
 {
 	int err = 0;
@@ -270,6 +258,3 @@ int mpsl_fem_configure(void)
 
 	return err;
 }
-// ~!~  #endif /* IS_ENABLED(CONFIG_MPSL_FEM) */
-
-// TODO:       ~!~
