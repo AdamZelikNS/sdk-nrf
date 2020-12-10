@@ -6,21 +6,9 @@ description: >
 
 compatible: "skyworks,sky66112-11"
 
-include: base.yaml
+include: generic-fem-two-ctrl-pins.yaml
 
 properties:
-    ctx-gpios:
-        type: phandle-array
-        required: false
-        description: >
-            Gpio of the SOC controlling CTX pin of the SKY66112-11
-
-    crx-gpios:
-        type: phandle-array
-        required: false
-        description: >
-            Gpio of the SOC controlling CRX pin of the SKY66112-11
-
     ctx-settle-time-us:
         type: int
         default: 23
