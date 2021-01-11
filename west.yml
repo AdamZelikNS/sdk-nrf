@@ -95,7 +95,7 @@ manifest:
     # changes.
     - name: hal_nordic
       repo-path: hal_nordic
-      revision: d446a301e4178c82508a74c31967d8d6d3817830
+      revision: 5d528be5e596aa0d5f6e3dd264c95b4ae9b64c9e
       path: modules/hal/nordic
       remote: adze_gh_ns
     - name: mcuboot
