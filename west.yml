@@ -33,6 +33,8 @@ manifest:
       url-base: https://github.com/nanopb
     - name: alexa
       url-base: https://github.com/alexa
+    - name: adze_gh_ns
+      url-base: https://github.com/AdamZelikNS
 
   # If not otherwise specified, the projects below should be obtained
   # from the ncs remote.
@@ -92,6 +94,11 @@ manifest:
     #
     # Some of these are also Zephyr modules which have NCS-specific
     # changes.
+    - name: hal_nordic
+      repo-path: hal_nordic
+      revision: 5d528be5e596aa0d5f6e3dd264c95b4ae9b64c9e
+      path: modules/hal/nordic
+      remote: adze_gh_ns
     - name: mcuboot
       repo-path: sdk-mcuboot
       revision: b95e49304a9ee82f83668d51c1d95c6f2faaf983
@@ -103,7 +110,7 @@ manifest:
     - name: nrfxlib
       repo-path: sdk-nrfxlib
       path: nrfxlib
-      revision: e6e02cb83d238fae2f54f084858bd5e49a31afa1
+      revision: pull/359/head
     # Other third-party repositories.
     - name: cmock
       path: test/cmock
