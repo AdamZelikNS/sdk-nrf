@@ -96,9 +96,9 @@ manifest:
     # changes.
     - name: hal_nordic
       repo-path: hal_nordic
-      revision: 5d528be5e596aa0d5f6e3dd264c95b4ae9b64c9e
+      revision: pull/80/head
       path: modules/hal/nordic
-      remote: adze_gh_ns
+      remote: zephyrproject
     - name: mcuboot
       repo-path: sdk-mcuboot
       revision: b95e49304a9ee82f83668d51c1d95c6f2faaf983
