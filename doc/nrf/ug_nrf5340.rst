@@ -216,14 +216,14 @@ See :ref:`ug_multi_image_defining` for details.
 
 Depending on which of the Bluetooth LE and IEEE 802.15.4 protocol stacks have been enabled for building, the appropriate sample is automatically selected to be used as a for child image the network core.
 
-+-------------------------------+------------------------------+------------------------------------------+
-|    |`CONFIG_BT_RPMSG_NRF53`   |`CONFIG_NRF_802154_SER_HOST`  |Child image sample for the network core   |
-+===============================+==============================+==========================================+
-|a)  |``y``                     |``n``                         |:ref:`zephyr:bluetooth-hci-rpmsg-sample`  |
 +----+--------------------------+------------------------------+------------------------------------------+
-|b)  |``n``                     |``y``                         |:ref:`nrf-ieee802154-rpmsg-sample`        |
+| .  | `CONFIG_BT_RPMSG_NRF53`  | `CONFIG_NRF_802154_SER_HOST` | Child image sample for the network core  |
++====+==========================+==============================+==========================================+
+| a) | ``y``                    | ``n``                        |:ref:`zephyr:bluetooth-hci-rpmsg-sample`  |
 +----+--------------------------+------------------------------+------------------------------------------+
-|c)  |``y``                     |``y``                         |Multiprotocol~RPMsg                       |
+| b) | ``n``                    | ``y``                        |:ref:`nrf-ieee802154-rpmsg-sample`        |
++----+--------------------------+------------------------------+------------------------------------------+
+| c) | ``y``                    | ``y``                        |Multiprotocol~RPMsg                       |
 +----+--------------------------+------------------------------+------------------------------------------+
 
 a) The network sample :ref:`zephyr:bluetooth-hci-rpmsg-sample` is automatically added to all Bluetooth Low Energy samples in the |NCS|.
