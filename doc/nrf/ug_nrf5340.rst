@@ -216,15 +216,15 @@ See :ref:`ug_multi_image_defining` for details.
 
 Depending on which of the Bluetooth LE and IEEE 802.15.4 protocol stacks have been enabled for building, the appropriate sample is automatically selected to be used as a for child image the network core.
 
-+----+--------------------------+------------------------------+------------------------------------------+
-| .  | `CONFIG_BT_RPMSG_NRF53`  | `CONFIG_NRF_802154_SER_HOST` | Child image sample for the network core  |
-+====+==========================+==============================+==========================================+
-| a) | ``y``                    | ``n``                        |:ref:`zephyr:bluetooth-hci-rpmsg-sample`  |
-+----+--------------------------+------------------------------+------------------------------------------+
-| b) | ``n``                    | ``y``                        |:ref:`nrf-ieee802154-rpmsg-sample`        |
-+----+--------------------------+------------------------------+------------------------------------------+
-| c) | ``y``                    | ``y``                        |Multiprotocol~RPMsg                       |
-+----+--------------------------+------------------------------+------------------------------------------+
++-----+--------------------------+-------------------------------+------------------------------------------+
+|     |``CONFIG_BT_RPMSG_NRF53`` |``CONFIG_NRF_802154_SER_HOST`` | Child image sample for the network core  |
++=====+==========================+===============================+==========================================+
+|`a)` |``y``                     |``n``                          |:ref:`zephyr:bluetooth-hci-rpmsg-sample`  |
++-----+--------------------------+-------------------------------+------------------------------------------+
+|`b)` |``n``                     |``y``                          |:ref:`nrf-ieee802154-rpmsg-sample`        |
++-----+--------------------------+-------------------------------+------------------------------------------+
+|`c)` |``y``                     |``y``                          |Multiprotocol~RPMsg                       |
++-----+--------------------------+-------------------------------+------------------------------------------+
 
 a) The network sample :ref:`zephyr:bluetooth-hci-rpmsg-sample` is automatically added to all Bluetooth Low Energy samples in the |NCS|.
 When :option:`CONFIG_BT_RPMSG_NRF53` is set to ``y`` (the default), the build system automatically includes the sample as a child image in the ``nrf5340_dk_nrf5340_cpunet`` core.
