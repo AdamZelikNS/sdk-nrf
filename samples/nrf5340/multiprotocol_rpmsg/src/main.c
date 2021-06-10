@@ -263,4 +263,11 @@ void nrf_802154_sl_fault_handler(uint32_t id, int32_t line, const char *err)
 	__ASSERT(false, "module_id: %u, line: %d, %s", id, line, err);
 }
 
+bool nrf_raal_workaround01_rtos_th_sleep(uint32_t length_us)
+{
+	(void)length_us;
+	k_sleep(K_MSEC(2));
+	return false;
+}
+
 SYS_INIT(register_endpoint, POST_KERNEL, CONFIG_RPMSG_SERVICE_EP_REG_PRIORITY);
