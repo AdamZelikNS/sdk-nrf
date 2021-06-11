@@ -188,9 +188,21 @@ static int hci_rpmsg_send(struct net_buf *buf)
 	return 0;
 }
 
+__WEAK void nrf_802154_nsc_assert_log(uint32_t id)
+{
+    // Intentionally empty.
+}
+
 #if defined(CONFIG_BT_CTLR_ASSERT_HANDLER)
 void bt_ctlr_assert_handle(char *file, uint32_t line)
 {
+	extern const uint8_t * nrf_802154_pib_short_address_get(void);
+	const uint8_t * ieee802154_sh_addr = nrf_802154_pib_short_address_get();
+	__ASSERT_MSG_INFO("ieee802154_short_address: { %d , %d }",
+			(uint32_t)(ieee802154_sh_addr[0]),
+			(uint32_t)(ieee802154_sh_addr[1]));
+	nrf_802154_nsc_assert_log(1);
+	// zephyr/subsys/bluetooth/common/log.h:
 	BT_ASSERT_MSG(false, "Controller assert in: %s at %d", file, line);
 }
 #endif /* CONFIG_BT_CTLR_ASSERT_HANDLER */
@@ -254,8 +266,13 @@ static int register_endpoint(const struct device *arg)
 
 void nrf_802154_serialization_error(const nrf_802154_ser_err_data_t *err)
 {
-	(void)err;
-	__ASSERT(false, "802.15.4 serialization error");
+	extern const uint8_t * nrf_802154_pib_short_address_get(void);
+	const uint8_t * ieee802154_sh_addr = nrf_802154_pib_short_address_get();
+	nrf_802154_nsc_assert_log(2);
+	__ASSERT_MSG_INFO("ieee802154_short_address: { %d , %d }",
+			(uint32_t)(ieee802154_sh_addr[0]),
+			(uint32_t)(ieee802154_sh_addr[1]));
+	__ASSERT(false, "802.15.4 serialization error [%d]", err->reason);
 }
 
 void nrf_802154_sl_fault_handler(uint32_t id, int32_t line, const char *err)
@@ -266,7 +283,7 @@ void nrf_802154_sl_fault_handler(uint32_t id, int32_t line, const char *err)
 bool nrf_raal_workaround01_rtos_th_sleep(uint32_t length_us)
 {
 	(void)length_us;
-	k_sleep(K_MSEC(2));
+	// k_sleep(K_MSEC(2));
 	return false;
 }
 
