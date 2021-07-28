@@ -396,3 +396,24 @@ int mpsl_fem_configure(void)
 
 	return err;
 }
+
+#define DBG0_VAL_TO_STRING(x) #x
+#define DBG0_VAL_0L(x) DBG0_VAL_TO_STRING(x)
+#define DBG0_SHOW_DEF(var) #var " == "  DBG0_VAL_0L(var)
+
+#pragma message(DBG0_SHOW_DEF(CONFIG_MPSL_FEM))
+#pragma message(DBG0_SHOW_DEF(CONFIG_MPSL_FEM_NRF21540_GPIO))
+#pragma message(DBG0_SHOW_DEF(CONFIG_MPSL_FEM_SIMPLE_GPIO))
+
+#if IS_ENABLED(CONFIG_MPSL_FEM_NRF21540_GPIO)
+#pragma message <><><><><><><><> Enabled: MPSL_FEM_NRF21540_GPIO <><><><><><><><>
+#pragma message(DBG0_SHOW_DEF( DT_GPIO_PIN(DT_NODELABEL(nrf_radio_fem), tx_en_gpios) ))
+#pragma message(DBG0_SHOW_DEF( DT_GPIO_PIN(DT_NODELABEL(nrf_radio_fem), rx_en_gpios) ))
+#pragma message(DBG0_SHOW_DEF( DT_GPIO_PIN(DT_NODELABEL(nrf_radio_fem), pdn_gpios) ))
+#endif
+
+#if IS_ENABLED(CONFIG_MPSL_FEM_SIMPLE_GPIO)
+#pragma message <><><><><><><><> Enabled: MPSL_FEM_SIMPLE_GPIO <><><><><><><><>
+#pragma message(DBG0_SHOW_DEF( DT_GPIO_PIN(DT_NODELABEL(nrf_radio_fem), ctx_gpios) ))
+#pragma message(DBG0_SHOW_DEF( DT_GPIO_PIN(DT_NODELABEL(nrf_radio_fem), crx_gpios) ))
+#endif
