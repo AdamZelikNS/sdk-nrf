@@ -74,10 +74,17 @@ static int entropy_cc3xx_rng_get_entropy(
 			 * using the CTR_DRBG features of the
 			 * nrf_cc310_platform/nrf_cc312_platform library.
 			 */
+			extern volatile uint32_t dbg0_cc3xx_get_in_progress;
+			extern volatile uint32_t dbg0_cc3xx_get_cntr;
+			dbg0_cc3xx_get_cntr += 1;
+			dbg0_cc3xx_get_in_progress += 1;
+			__DMB();
 			res = nrf_cc3xx_platform_ctr_drbg_get(&ctr_drbg_ctx,
 								buffer + offset,
 								chunk_size,
 								&olen);
+			__DMB();
+			dbg0_cc3xx_get_in_progress -= 1;
 		#endif
 
 		if (olen != chunk_size) {
@@ -143,3 +150,19 @@ static const struct entropy_driver_api entropy_cc3xx_rng_api = {
 DEVICE_DT_DEFINE(CRYPTOCELL_NODE_ID, entropy_cc3xx_rng_init,
 		 NULL, NULL, NULL, PRE_KERNEL_1,
 		 CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &entropy_cc3xx_rng_api);
+
+volatile uint32_t dbg0_cc3xx_get_in_progress = 0;
+volatile uint32_t dbg0_cc3xx_get_cntr = 0;
+
+uint32_t dbg0_sys_rand32_stat(int cnt_id)
+{
+	if (cnt_id == 0)
+	{
+		__DMB();
+		return dbg0_cc3xx_get_in_progress;
+	}
+	else
+	{
+		return dbg0_cc3xx_get_cntr;
+	}
+}
