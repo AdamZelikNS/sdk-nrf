@@ -107,7 +107,8 @@ manifest:
     - name: nrfxlib
       repo-path: sdk-nrfxlib
       path: nrfxlib
-      revision: aa5661dbe16ab55b5f0665220660b051277eac25
+      revision: bughunt/krknwk-11071-echo_client_server_stats_freezing
+      remote: adze_gh
     - name: trusted-firmware-m
       repo-path: sdk-trusted-firmware-m
       path: modules/tee/tfm
