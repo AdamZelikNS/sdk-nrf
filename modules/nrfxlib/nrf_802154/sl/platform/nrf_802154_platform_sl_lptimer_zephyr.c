@@ -7,6 +7,7 @@
 #include "platform/nrf_802154_platform_sl_lptimer.h"
 
 #include <assert.h>
+#include <sys/atomic.h>
 #include <zephyr/kernel.h>
 
 #include "drivers/timer/nrf_rtc_timer.h"
@@ -14,6 +15,7 @@
 #include "platform/nrf_802154_clock.h"
 #include "nrf_802154_sl_utils.h"
 
+#define RTC_CHAN_INVALID (-1)
 
 struct timer_desc {
 	z_nrf_rtc_timer_compare_handler_t handler;
@@ -22,8 +24,23 @@ struct timer_desc {
 	int32_t int_lock_key;
 };
 
+enum hw_task_state_type {
+	HW_TASK_STATE_IDLE,
+	HW_TASK_STATE_SETTING_UP,
+	HW_TASK_STATE_READY,
+	HW_TASK_STATE_UPDATING,
+	HW_TASK_STATE_CLEANING
+};
+
+struct hw_task_desc {
+	atomic_t state;
+	int32_t chan;
+	int32_t ppi;
+};
+
 static struct timer_desc m_timer;
 static struct timer_desc m_sync_timer;
+static struct hw_task_desc m_hw_task;
 static volatile bool m_clock_ready;
 static bool m_in_critical_section;
 
@@ -79,9 +96,37 @@ static void timer_start_at(struct timer_desc *timer, uint64_t target_time)
 	nrf_802154_sl_mcu_critical_exit(state);
 }
 
+static bool hw_task_state_set(enum hw_task_state_type expected_state,
+			      enum hw_task_state_type new_state)
+{
+	return atomic_cas(&m_hw_task.state, expected_state, new_state);
+}
+
+static void cc_bind_to_ppi(int32_t cc_num, uint32_t ppi_num)
+{
+	z_nrf_rtc_timer_compare_evt_publish_set(cc_num, ppi_num);
+}
+
+static void cc_unbind(int32_t cc_num, uint32_t ppi_num, bool check_before_clr)
+{
+	if (ppi_num != NRF_802154_SL_HW_TASK_PPI_INVALID) {
+		z_nrf_rtc_timer_compare_evt_publish_clear(cc_num, ppi_num);
+	}
+}
+
+static bool cc_event_check(int32_t cc_num)
+{
+	uint32_t event_address = z_nrf_rtc_timer_compare_evt_address_get(cc_num);
+
+	return *(volatile uint32_t *)event_address;
+}
+
 void nrf_802154_platform_sl_lp_timer_init(void)
 {
 	m_in_critical_section = false;
+	m_hw_task.state = HW_TASK_STATE_IDLE;
+	m_hw_task.chan = RTC_CHAN_INVALID;
+	m_hw_task.ppi = NRF_802154_SL_HW_TASK_PPI_INVALID;
 	m_timer.handler = timer_handler;
 	m_sync_timer.handler = sync_timer_handler;
 
@@ -200,4 +245,109 @@ uint32_t nrf_802154_platform_sl_lptimer_sync_event_get(void)
 uint64_t nrf_802154_platform_sl_lptimer_sync_lpticks_get(void)
 {
 	return m_sync_timer.target_time;
+}
+
+nrf_802154_sl_lptimer_platform_result_t nrf_802154_platform_sl_lptimer_hw_task_prepare(
+	uint64_t fire_lpticks,
+	uint32_t ppi_channel)
+{
+	bool done_on_time;
+	nrf_802154_sl_mcu_critical_state_t mcu_cs_state;
+
+	if (!hw_task_state_set(HW_TASK_STATE_IDLE, HW_TASK_STATE_SETTING_UP)) {
+		/* The only one available set of peripherals is already used. */
+		return NRF_802154_SL_LPTIMER_PLATFORM_NO_RESOURCES;
+	}
+
+	/* For nRF52, the channel allocation could be in nrf_802154_platform_sl_timer_hw_task_init.
+	 * For nRF53, the channel allocation must be here, as it would run out of resources during
+	 * initialization - some other module temporarily needs an rtc channel to initialize.
+	 */
+	m_hw_task.chan = z_nrf_rtc_timer_chan_alloc();
+	if (m_hw_task.chan < 0) {
+		hw_task_state_set(HW_TASK_STATE_SETTING_UP, HW_TASK_STATE_IDLE);
+		return NRF_802154_SL_LPTIMER_PLATFORM_NO_RESOURCES;
+	}
+
+	if (z_nrf_rtc_timer_set(m_hw_task.chan, fire_lpticks, NULL, NULL) != 0) {
+		z_nrf_rtc_timer_chan_free(m_hw_task.chan);
+		m_hw_task.chan = RTC_CHAN_INVALID;
+		hw_task_state_set(HW_TASK_STATE_SETTING_UP, HW_TASK_STATE_IDLE);
+		return NRF_802154_SL_LPTIMER_PLATFORM_TOO_DISTANT;
+	}
+
+	if (ppi_channel != NRF_802154_SL_HW_TASK_PPI_INVALID) {
+		cc_bind_to_ppi(m_hw_task.chan, ppi_channel);
+	}
+	m_hw_task.ppi = ppi_channel;
+
+	nrf_802154_sl_mcu_critical_enter(mcu_cs_state);
+
+	/* For triggering to take place a safe margin is 2 lpticks from `now`. */
+	if ((z_nrf_rtc_timer_read() + 2) > fire_lpticks) {
+		/* it is too late */
+		cc_unbind(m_hw_task.chan, ppi_channel, false);
+		m_hw_task.ppi = NRF_802154_SL_HW_TASK_PPI_INVALID;
+
+		z_nrf_rtc_timer_abort(m_hw_task.chan);
+		z_nrf_rtc_timer_chan_free(m_hw_task.chan);
+		m_hw_task.chan = RTC_CHAN_INVALID;
+		done_on_time = false;
+	} else {
+		done_on_time = true;
+	}
+
+	nrf_802154_sl_mcu_critical_exit(mcu_cs_state);
+
+	hw_task_state_set(HW_TASK_STATE_SETTING_UP,
+			  done_on_time ? HW_TASK_STATE_READY : HW_TASK_STATE_IDLE);
+
+	return done_on_time ? NRF_802154_SL_LPTIMER_PLATFORM_SUCCESS :
+	       NRF_802154_SL_LPTIMER_PLATFORM_TOO_LATE;
+}
+
+void nrf_802154_platform_sl_lptimer_hw_task_cleanup(void)
+{
+	if (!hw_task_state_set(HW_TASK_STATE_READY, HW_TASK_STATE_CLEANING)) {
+		return;
+	}
+
+	z_nrf_rtc_timer_abort(m_hw_task.chan);
+
+	cc_unbind(m_hw_task.chan, m_hw_task.ppi, true);
+	m_hw_task.ppi = NRF_802154_SL_HW_TASK_PPI_INVALID;
+
+	z_nrf_rtc_timer_chan_free(m_hw_task.chan);
+	m_hw_task.chan = RTC_CHAN_INVALID;
+
+	hw_task_state_set(HW_TASK_STATE_CLEANING, HW_TASK_STATE_IDLE);
+}
+
+nrf_802154_sl_lptimer_platform_result_t nrf_802154_platform_sl_lptimer_hw_task_update_ppi(
+	uint32_t ppi_channel)
+{
+	bool cc_triggered;
+
+	if (!hw_task_state_set(HW_TASK_STATE_READY, HW_TASK_STATE_UPDATING)) {
+		return NRF_802154_SL_LPTIMER_PLATFORM_WRONG_STATE;
+	}
+
+	cc_bind_to_ppi(m_hw_task.chan, ppi_channel);
+	m_hw_task.ppi = ppi_channel;
+
+	cc_triggered = cc_event_check(m_hw_task.chan);
+
+	hw_task_state_set(HW_TASK_STATE_UPDATING, HW_TASK_STATE_READY);
+
+	return cc_triggered ? NRF_802154_SL_LPTIMER_PLATFORM_TOO_LATE :
+	       NRF_802154_SL_LPTIMER_PLATFORM_SUCCESS;
+}
+
+bool nrf_802154_platform_sl_lptimer_hw_task_check_if_ppi_fired(void)
+{
+	if (atomic_get(&m_hw_task.state) != HW_TASK_STATE_READY) {
+		return false;
+	}
+
+	return cc_event_check(m_hw_task.chan);
 }
