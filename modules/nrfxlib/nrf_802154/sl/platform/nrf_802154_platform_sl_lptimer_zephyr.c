@@ -11,6 +11,7 @@
 #include <zephyr/kernel.h>
 
 #include "drivers/timer/nrf_rtc_timer.h"
+#include <helpers/nrfx_gppi.h>
 
 #include "platform/nrf_802154_clock.h"
 #include "nrf_802154_sl_utils.h"
@@ -104,13 +105,19 @@ static bool hw_task_state_set(enum hw_task_state_type expected_state,
 
 static void cc_bind_to_ppi(int32_t cc_num, uint32_t ppi_num)
 {
-	z_nrf_rtc_timer_compare_evt_publish_set(cc_num, ppi_num);
+    uint32_t event_address = z_nrf_rtc_timer_compare_evt_address_get(cc_num);
+
+    nrfx_gppi_event_endpoint_setup(ppi_num, event_address);
 }
 
-static void cc_unbind(int32_t cc_num, uint32_t ppi_num, bool check_before_clr)
+static void cc_unbind(int32_t cc_num, uint32_t ppi_num)
 {
+    uint32_t event_address;
+
 	if (ppi_num != NRF_802154_SL_HW_TASK_PPI_INVALID) {
-		z_nrf_rtc_timer_compare_evt_publish_clear(cc_num, ppi_num);
+        event_address = z_nrf_rtc_timer_compare_evt_address_get(cc_num);
+
+        nrfx_gppi_event_endpoint_clear(ppi_num, event_address);
 	}
 }
 
@@ -286,7 +293,7 @@ nrf_802154_sl_lptimer_platform_result_t nrf_802154_platform_sl_lptimer_hw_task_p
 	/* For triggering to take place a safe margin is 2 lpticks from `now`. */
 	if ((z_nrf_rtc_timer_read() + 2) > fire_lpticks) {
 		/* it is too late */
-		cc_unbind(m_hw_task.chan, ppi_channel, false);
+		cc_unbind(m_hw_task.chan, ppi_channel);
 		m_hw_task.ppi = NRF_802154_SL_HW_TASK_PPI_INVALID;
 
 		z_nrf_rtc_timer_abort(m_hw_task.chan);
@@ -314,7 +321,7 @@ void nrf_802154_platform_sl_lptimer_hw_task_cleanup(void)
 
 	z_nrf_rtc_timer_abort(m_hw_task.chan);
 
-	cc_unbind(m_hw_task.chan, m_hw_task.ppi, true);
+	cc_unbind(m_hw_task.chan, m_hw_task.ppi);
 	m_hw_task.ppi = NRF_802154_SL_HW_TASK_PPI_INVALID;
 
 	z_nrf_rtc_timer_chan_free(m_hw_task.chan);
