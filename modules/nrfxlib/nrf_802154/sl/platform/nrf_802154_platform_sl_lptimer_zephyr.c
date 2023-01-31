@@ -36,6 +36,7 @@ enum hw_task_state_type {
 struct hw_task_desc {
 	atomic_t state;
 	int32_t chan;
+	uint32_t ev_addr;
 	int32_t ppi;
 };
 
@@ -103,27 +104,21 @@ static bool hw_task_state_set(enum hw_task_state_type expected_state,
 	return atomic_cas(&m_hw_task.state, expected_state, new_state);
 }
 
-static void cc_bind_to_ppi(int32_t cc_num, uint32_t ppi_num)
+static void cc_bind_to_ppi(uint32_t ppi_num)
 {
-	uint32_t event_address = z_nrf_rtc_timer_compare_evt_address_get(cc_num);
-
-	nrfx_gppi_event_endpoint_setup(ppi_num, event_address);
+	nrfx_gppi_event_endpoint_setup(ppi_num, m_hw_task.ev_addr);
 }
 
 static void cc_unbind(int32_t cc_num, uint32_t ppi_num)
 {
 	if (ppi_num != NRF_802154_SL_HW_TASK_PPI_INVALID) {
-		uint32_t event_address = z_nrf_rtc_timer_compare_evt_address_get(cc_num);
-
-		nrfx_gppi_event_endpoint_clear(ppi_num, event_address);
+		nrfx_gppi_event_endpoint_clear(ppi_num, m_hw_task.ev_addr);
 	}
 }
 
-static bool cc_event_check(int32_t cc_num)
+static bool cc_event_check(void)
 {
-	uint32_t event_address = z_nrf_rtc_timer_compare_evt_address_get(cc_num);
-
-	return *(volatile uint32_t *)event_address;
+	return *(volatile uint32_t *)(m_hw_task.ev_addr);
 }
 
 void nrf_802154_platform_sl_lp_timer_init(void)
@@ -131,6 +126,7 @@ void nrf_802154_platform_sl_lp_timer_init(void)
 	m_in_critical_section = false;
 	m_hw_task.state = HW_TASK_STATE_IDLE;
 	m_hw_task.chan = RTC_CHAN_INVALID;
+	m_hw_task.ev_addr = 0;
 	m_hw_task.ppi = NRF_802154_SL_HW_TASK_PPI_INVALID;
 	m_timer.handler = timer_handler;
 	m_sync_timer.handler = sync_timer_handler;
@@ -160,6 +156,7 @@ void nrf_802154_platform_sl_lp_timer_deinit(void)
 	if (m_hw_task.chan != RTC_CHAN_INVALID) {
 		z_nrf_rtc_timer_chan_free(m_hw_task.chan);
 		m_hw_task.chan = RTC_CHAN_INVALID;
+	m_hw_task.ev_addr = 0;
 	}
 }
 
@@ -261,7 +258,6 @@ nrf_802154_sl_lptimer_platform_result_t nrf_802154_platform_sl_lptimer_hw_task_p
 	uint64_t fire_lpticks,
 	uint32_t ppi_channel)
 {
-	uint32_t evt_address;
 	nrf_802154_sl_mcu_critical_state_t mcu_cs_state;
 
 	if (!hw_task_state_set(HW_TASK_STATE_IDLE, HW_TASK_STATE_SETTING_UP)) {
@@ -292,7 +288,7 @@ nrf_802154_sl_lptimer_platform_result_t nrf_802154_platform_sl_lptimer_hw_task_p
 		return NRF_802154_SL_LPTIMER_PLATFORM_TOO_DISTANT;
 	}
 
-	evt_address = z_nrf_rtc_timer_compare_evt_address_get(m_hw_task.chan);
+	m_hw_task.ev_addr = z_nrf_rtc_timer_compare_evt_address_get(m_hw_task.chan);
 
 	nrf_802154_sl_mcu_critical_enter(mcu_cs_state);
 
@@ -300,7 +296,6 @@ nrf_802154_sl_lptimer_platform_result_t nrf_802154_platform_sl_lptimer_hw_task_p
 	if ((z_nrf_rtc_timer_read() + 2) > fire_lpticks) {
 		/* it is too late */
 		nrf_802154_sl_mcu_critical_exit(mcu_cs_state);
-		cc_unbind(m_hw_task.chan, ppi_channel);
 		m_hw_task.ppi = NRF_802154_SL_HW_TASK_PPI_INVALID;
 		z_nrf_rtc_timer_abort(m_hw_task.chan);
 		hw_task_state_set(HW_TASK_STATE_SETTING_UP, HW_TASK_STATE_IDLE);
@@ -308,7 +303,7 @@ nrf_802154_sl_lptimer_platform_result_t nrf_802154_platform_sl_lptimer_hw_task_p
 	}
 
 	if (ppi_channel != NRF_802154_SL_HW_TASK_PPI_INVALID) {
-		nrfx_gppi_event_endpoint_setup(ppi_channel, evt_address);
+		cc_bind_to_ppi(ppi_channel);
 	}
 	m_hw_task.ppi = ppi_channel;
 	nrf_802154_sl_mcu_critical_exit(mcu_cs_state);
@@ -341,10 +336,10 @@ nrf_802154_sl_lptimer_platform_result_t nrf_802154_platform_sl_lptimer_hw_task_u
 		return NRF_802154_SL_LPTIMER_PLATFORM_WRONG_STATE;
 	}
 
-	cc_bind_to_ppi(m_hw_task.chan, ppi_channel);
+	cc_bind_to_ppi(ppi_channel);
 	m_hw_task.ppi = ppi_channel;
 
-	cc_triggered = cc_event_check(m_hw_task.chan);
+	cc_triggered = cc_event_check();
 
 	hw_task_state_set(HW_TASK_STATE_UPDATING, HW_TASK_STATE_READY);
 
