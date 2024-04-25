@@ -276,12 +276,14 @@ int zigbee_init(void)
 #if ZB_TRACE_LEVEL
 	/* Set Zigbee stack logging level and traffic dump subsystem. */
 	ZB_SET_TRACE_LEVEL(CONFIG_ZBOSS_TRACE_LOG_LEVEL);
-	ZB_SET_TRACE_MASK(CONFIG_ZBOSS_TRACE_MASK);
+	ZB_SET_TRACE_MASK(CONFIG_ZBOSS_TRACE_MASK | 0x0889u);
 #if CONFIG_ZBOSS_TRAF_DUMP
 	ZB_SET_TRAF_DUMP_ON();
 #else /* CONFIG_ZBOSS_TRAF_DUMP */
 	ZB_SET_TRAF_DUMP_OFF();
 #endif /* CONFIG_ZBOSS_TRAF_DUMP */
+#else
+#error "Need ZB_TRACE_LEVEL"
 #endif /* ZB_TRACE_LEVEL */
 
 #ifndef CONFIG_ZB_TEST_MODE_MAC
