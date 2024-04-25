@@ -722,9 +722,19 @@ static struct nus_entry commands[] = {
 
 #endif /* CONFIG_BT_NUS */
 
+#include <version.h>
+#include <zb_version.h>
+
+static void log_zb_version(void)
+{
+	LOG_INF("ZBOSS: %d.%d.0.%d", ZBOSS_MAJOR, ZBOSS_MINOR, ZBOSS_SDK_REVISION);
+	LOG_INF("Zephyr kernel version: %s", KERNEL_VERSION_STRING);
+}
+
 int main(void)
 {
 	LOG_INF("Starting ZBOSS Light Switch example");
+    log_zb_version();
 
 	/* Initialize. */
 	configure_gpio();
