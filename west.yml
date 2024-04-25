@@ -39,6 +39,8 @@ manifest:
       url-base: https://github.com/BabbleSim
     - name: bosch
       url-base: https://github.com/boschsensortec
+    - name: adze_ns_gh
+      url-base: https://github.com/AdamZelikNS
 
   # If not otherwise specified, the projects below should be obtained
   # from the ncs remote.
@@ -141,8 +143,9 @@ manifest:
       revision: v3.5.2-ncs1
     - name: nrfxlib
       repo-path: sdk-nrfxlib
+      remote: adze_ns_gh
       path: nrfxlib
-      revision: pull/1307/head
+      revision: tst/zboss_nvr_impr_3debug
     - name: trusted-firmware-m
       repo-path: sdk-trusted-firmware-m
       path: modules/tee/tf-m/trusted-firmware-m
