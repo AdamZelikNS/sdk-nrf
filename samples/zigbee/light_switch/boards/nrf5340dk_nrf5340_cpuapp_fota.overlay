@@ -50,7 +50,11 @@
 
 / {
 	chosen {
-		zephyr,code-partition = &slot0_partition;
 		nordic,pm-ext-flash = &mx25r64;
+		ncs,zigbee-timer = &timer2;
 	};
+};
+
+&timer2 {
+	status = "okay";
 };
