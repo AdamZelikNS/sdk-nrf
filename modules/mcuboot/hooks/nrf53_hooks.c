@@ -69,6 +69,33 @@ int pcd_version_cmp_net(const struct flash_area *fap, struct image_header *hdr)
 }
 #endif
 
+#if (MCUBOOT_IMAGE_NUMBER == 2) && !defined(PM_MCUBOOT_PRIMARY_1_ID)
+/* Don't know yet why the PM script now doesn't generate this. For now, a quick dirty hack - These defs are  */
+/* taken from some old, successful build: build_dir/mcuboot/zephyr/include/generated/pm_config.h             */
+#define PM_MCUBOOT_PRIMARY_1_OFFSET 0x0
+#define PM_MCUBOOT_PRIMARY_1_ADDRESS 0x0
+#define PM_MCUBOOT_PRIMARY_1_END_ADDRESS 0x40000
+#define PM_MCUBOOT_PRIMARY_1_SIZE 0x40000
+#define PM_MCUBOOT_PRIMARY_1_NAME mcuboot_primary_1
+#define PM_MCUBOOT_PRIMARY_1_ID 1
+#define PM_mcuboot_primary_1_ID PM_MCUBOOT_PRIMARY_1_ID
+#define PM_mcuboot_primary_1_IS_ENABLED 1
+/* defi PM_1_LABEL MCUBOOT_PRIMARY_1 */
+#define PM_MCUBOOT_PRIMARY_1_DEV nordic_ram_flash_controller
+#define PM_MCUBOOT_PRIMARY_1_DEFAULT_DRIVER_KCONFIG CONFIG_FLASH_SIMULATOR
+#endif
+
+#if (MCUBOOT_IMAGE_NUMBER == 2) && !defined(PM_CPUNET_B0N_ID)
+#define PM_CPUNET_B0N_OFFSET 0x0
+#define PM_CPUNET_B0N_ADDRESS 0x1000000
+#define PM_CPUNET_B0N_END_ADDRESS 0x1008580
+#define PM_CPUNET_B0N_SIZE 0x8580
+#define PM_CPUNET_B0N_NAME b0n
+#define PM_CPUNET_B0N_ID 13
+#define PM_CPUNET_b0n_ID PM_B0N_ID
+#define PM_CPUNET_b0n_IS_ENABLED 1
+#endif
+
 int boot_read_image_header_hook(int img_index, int slot, struct image_header *img_head)
 {
 	if (img_index == 1 && slot == 0) {
