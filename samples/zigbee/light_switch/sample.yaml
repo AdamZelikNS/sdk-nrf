@@ -38,14 +38,6 @@ tests:
     build_only: true
     extra_args: >
       FILE_SUFFIX=fota
-      SB_CONFIG_PARTITION_MANAGER=y
-      SB_CONFIG_PM_EXTERNAL_FLASH_MCUBOOT_SECONDARY=y
-      SB_CONFIG_MCUBOOT_UPDATEABLE_IMAGES=2
-      SB_CONFIG_MCUBOOT_MODE_OVERWRITE_ONLY=y
-      SB_CONFIG_DFU_MULTI_IMAGE_PACKAGE_NET=y
-      SB_CONFIG_NETCORE_802154_RPMSG=y
-      SB_CONFIG_SECURE_BOOT_NETCORE=y
-      SB_CONFIG_NETCORE_APP_UPDATE=y
     integration_platforms:
       - nrf5340dk/nrf5340/cpuapp
     platform_allow: nrf5340dk/nrf5340/cpuapp
@@ -63,16 +55,7 @@ tests:
     sysbuild: true
     build_only: true
     extra_args: >
-      FILE_SUFFIX=fota
-      OVERLAY_CONFIG=overlay-multiprotocol_ble.conf
-      SB_CONFIG_PARTITION_MANAGER=y
-      SB_CONFIG_PM_EXTERNAL_FLASH_MCUBOOT_SECONDARY=y
-      SB_CONFIG_MCUBOOT_UPDATEABLE_IMAGES=2
-      SB_CONFIG_MCUBOOT_MODE_OVERWRITE_ONLY=y
-      SB_CONFIG_DFU_MULTI_IMAGE_PACKAGE_NET=y
-      SB_CONFIG_NETCORE_802154_RPMSG=y
-      SB_CONFIG_SECURE_BOOT_NETCORE=y
-      SB_CONFIG_NETCORE_APP_UPDATE=y
+      FILE_SUFFIX=fota OVERLAY_CONFIG=overlay-multiprotocol_ble.conf
     integration_platforms:
       - nrf5340dk/nrf5340/cpuapp
     platform_allow: nrf5340dk/nrf5340/cpuapp
