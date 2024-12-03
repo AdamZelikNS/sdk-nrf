@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
+#define ZB_TRACE_FILE_ID 40901
+
 #include <stdlib.h>
 #include <zephyr/kernel.h>
 #include <zephyr/sys/reboot.h>
@@ -202,21 +204,21 @@ static void zb_app_cb_process(zb_bufid_t bufid)
 			break;
 		case ZB_GET_OUT_BUF_DELAYED:
 			ret_code = zb_buf_get_out_delayed_func(
-				TRACE_CALL(new_app_cb.func));
+				TRACE_CALL new_app_cb.func);
 			break;
 		case ZB_GET_IN_BUF_DELAYED:
 			ret_code = zb_buf_get_in_delayed_func(
-				TRACE_CALL(new_app_cb.func));
+				TRACE_CALL new_app_cb.func);
 			break;
 		case ZB_GET_OUT_BUF_DELAYED_EXT:
 			ret_code = zb_buf_get_out_delayed_ext_func(
-					TRACE_CALL(new_app_cb.func2),
+					TRACE_CALL new_app_cb.func2,
 					new_app_cb.user_param,
 					new_app_cb.param);
 			break;
 		case ZB_GET_IN_BUF_DELAYED_EXT:
 			ret_code = zb_buf_get_in_delayed_ext_func(
-					TRACE_CALL(new_app_cb.func2),
+					TRACE_CALL new_app_cb.func2,
 					new_app_cb.user_param,
 					new_app_cb.param);
 			break;
@@ -468,7 +470,7 @@ zb_ret_t zigbee_schedule_alarm_cancel(zb_callback_t func, zb_uint8_t param)
 zb_ret_t zigbee_get_out_buf_delayed(zb_callback_t func)
 {
 	if ((zboss_tid) && (k_current_get() == zboss_tid) && (!zb_osif_is_inside_isr())) {
-		return zb_buf_get_out_delayed_func(func);
+		return zb_buf_get_out_delayed_func(TRACE_CALL func);
 	}
 
 	zb_app_cb_t new_app_cb = {
@@ -487,7 +489,7 @@ zb_ret_t zigbee_get_out_buf_delayed(zb_callback_t func)
 zb_ret_t zigbee_get_in_buf_delayed(zb_callback_t func)
 {
 	if ((zboss_tid) && (k_current_get() == zboss_tid) && (!zb_osif_is_inside_isr())) {
-		return zb_buf_get_in_delayed_func(func);
+		return zb_buf_get_in_delayed_func(TRACE_CALL func);
 	}
 
 	zb_app_cb_t new_app_cb = {
@@ -507,7 +509,7 @@ zb_ret_t zigbee_get_out_buf_delayed_ext(zb_callback2_t func, zb_uint16_t param,
 					zb_uint16_t max_size)
 {
 	if ((zboss_tid) && (k_current_get() == zboss_tid) && (!zb_osif_is_inside_isr())) {
-		return zb_buf_get_out_delayed_ext_func(func, param, max_size);
+		return zb_buf_get_out_delayed_ext_func(TRACE_CALL func, param, max_size);
 	}
 
 	zb_app_cb_t new_app_cb = {
@@ -529,7 +531,7 @@ zb_ret_t zigbee_get_in_buf_delayed_ext(zb_callback2_t func, zb_uint16_t param,
 					zb_uint16_t max_size)
 {
 	if ((zboss_tid) && (k_current_get() == zboss_tid) && (!zb_osif_is_inside_isr())) {
-		return zb_buf_get_in_delayed_ext_func(func, param, max_size);
+		return zb_buf_get_in_delayed_ext_func(TRACE_CALL func, param, max_size);
 	}
 
 	zb_app_cb_t new_app_cb = {
