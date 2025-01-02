@@ -39,6 +39,8 @@ manifest:
       url-base: https://github.com/boschsensortec
     - name: eembc
       url-base: https://github.com/eembc
+    - name: gh_adze
+      url-base: https://github.com/AdamZelikNS
 
   # If not otherwise specified, the projects below should be obtained
   # from the ncs remote.
@@ -147,7 +149,8 @@ manifest:
     - name: nrfxlib
       repo-path: sdk-nrfxlib
       path: nrfxlib
-      revision: 64948a431c46e57acfe7dbbb5ec8a37f30be8a6f
+      remote: gh_adze
+      revision: c6cb68838cca280d2b8be2369760586f55d0bc99
     - name: trusted-firmware-m
       repo-path: sdk-trusted-firmware-m
       path: modules/tee/tf-m/trusted-firmware-m
