@@ -17,6 +17,7 @@
 #include <zephyr/logging/log.h>
 #include <dk_buttons_and_leds.h>
 #include <zephyr/settings/settings.h>
+#include <zephyr/sys/reboot.h>
 
 #include <zboss_api.h>
 #include <zboss_api_addons.h>
@@ -175,6 +176,52 @@ ZB_DECLARE_DIMMABLE_LIGHT_EP(
 ZBOSS_DECLARE_DEVICE_CTX_1_EP(
 	dimmable_light_ctx,
 	dimmable_light_ep);
+
+#define ZCL_CONFIG_INTERN_VERSION_CURRENT  0x0101u
+#define ZCL_CONFIG_INTERN_VERSION_UNKNOWN  0xFFFFu
+zb_uint16_t zcl_config_intern_ver_in_nvram = ZCL_CONFIG_INTERN_VERSION_UNKNOWN;
+
+#define M2S_0HLPR(v) #v
+#define M2S_HLPR(v) M2S_0HLPR(v)
+
+typedef struct application_dataset_s
+{
+	zb_uint16_t zcl_config_internal_version;
+	zb_uint8_t  align[2];
+} ZB_PACKED_STRUCT application_dataset_t;
+
+ZB_ASSERT_IF_NOT_ALIGNED_TO_4(application_dataset_t);
+
+void nvram_read_app_data(zb_uint8_t page, zb_uint32_t pos, zb_uint16_t payload_length)
+{
+	application_dataset_t ds;
+	zb_ret_t ret;
+	ZB_ASSERT(payload_length == sizeof(ds));
+	/* If we fail, trace is given and assertion is triggered */
+	ret = zb_nvram_read_data(page, pos, (zb_uint8_t*)&ds, sizeof(ds));
+	if (ret == RET_OK) {
+		zcl_config_intern_ver_in_nvram = ds.zcl_config_internal_version;
+	} else {
+		zcl_config_intern_ver_in_nvram = ZCL_CONFIG_INTERN_VERSION_UNKNOWN;
+	}
+}
+
+zb_ret_t nvram_write_app_data(zb_uint8_t page, zb_uint32_t pos)
+{
+	zb_ret_t ret;
+	application_dataset_t ds;
+
+	ds.zcl_config_internal_version = ZCL_CONFIG_INTERN_VERSION_CURRENT;
+
+	/* If we fail, trace is given and assertion is triggered */
+	ret = zb_nvram_write_data(page, pos, (zb_uint8_t*)&ds, sizeof(ds));
+	return ret;
+}
+
+zb_uint16_t nvram_get_app_data_size(void)
+{
+	return sizeof(application_dataset_t);
+}
 
 /**@brief Starts identifying the device.
  *
@@ -519,12 +566,29 @@ void zboss_signal_handler(zb_bufid_t bufid)
 	}
 }
 
+static void clr_incompat_zb_nvram_data(zb_bufid_t bufid)
+{
+	ZVUNUSED(bufid);
+
+	if (zcl_config_intern_ver_in_nvram == ZCL_CONFIG_INTERN_VERSION_UNKNOWN) {
+		(void)zb_nvram_write_dataset(ZB_NVRAM_APP_DATA1);
+	} else {
+		/* Clear ZCL Reporting parameters, i.e. values cashed in RAM. */
+		zb_zcl_init_reporting_info();
+
+		/* Clear all datasets except ZB_IB_COUNTERS and application datasets. */
+		zb_nvram_clear();
+
+		(void)zb_nvram_write_dataset(ZB_NVRAM_APP_DATA1);
+	}
+}
+
 int main(void)
 {
 	int blink_status = 0;
 	int err;
 
-	LOG_INF("Starting ZBOSS Light Bulb example");
+	LOG_INF("Starting ZBOSS Light Bulb e 100v");
 
 	/* Initialize */
 	configure_gpio();
@@ -555,10 +619,34 @@ int main(void)
 		LOG_ERR("settings loading failed");
 	}
 
+	zb_nvram_register_app1_read_cb(nvram_read_app_data);
+	zb_nvram_register_app1_write_cb(nvram_write_app_data, nvram_get_app_data_size);
+
 	/* Start Zigbee default thread */
 	zigbee_enable();
 
 	LOG_INF("ZBOSS Light Bulb example started");
+	k_sleep(K_MSEC(50));
+
+	if (zcl_config_intern_ver_in_nvram == ZCL_CONFIG_INTERN_VERSION_CURRENT) {
+		LOG_INF("In NVRAM the saved ZCL config matches the current, "
+		        "which is " M2S_HLPR(ZCL_CONFIG_INTERN_VERSION_CURRENT));
+	} else {
+		LOG_INF("In NVRAM the saved ZCL config is 0x%04hx but "
+		        "expected is " M2S_HLPR(ZCL_CONFIG_INTERN_VERSION_CURRENT),
+		        zcl_config_intern_ver_in_nvram);
+		LOG_INF("This is a reason to modify the NVRAM contents \n (including "
+		        "wiping ZCL Reporting cfg) and reboot the SoC.");
+
+		ZB_SCHEDULE_APP_CALLBACK(clr_incompat_zb_nvram_data, 0);
+
+		k_sleep(K_MSEC(100));
+
+		if (zcl_config_intern_ver_in_nvram != ZCL_CONFIG_INTERN_VERSION_UNKNOWN) {
+			k_sleep(K_MSEC(100));
+			sys_reboot(SYS_REBOOT_COLD);
+		}
+	}
 
 	while (1) {
 		dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
