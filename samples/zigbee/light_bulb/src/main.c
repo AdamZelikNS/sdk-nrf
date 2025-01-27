@@ -153,14 +153,14 @@ ZB_ZCL_DECLARE_ON_OFF_ATTRIB_LIST(
 	on_off_attr_list,
 	&dev_ctx.on_off_attr.on_off);
 
-#if 0
+#if 1
 ZB_ZCL_DECLARE_LEVEL_CONTROL_ATTRIB_LIST(
 	level_control_attr_list,
 	&dev_ctx.level_control_attr.current_level,
 	&dev_ctx.level_control_attr.remaining_time);
 
 
-#elif 1
+#elif 0
 
 zb_uint8_t g_attr_level_control_start_up_current_level;
 zb_uint8_t g_attr_level_control_options = 0x00;
@@ -611,7 +611,7 @@ int main(void)
 	int blink_status = 0;
 	int err;
 
-	LOG_INF("Starting ZBOSS Light Bulb e 201v");
+	LOG_INF("Starting ZBOSS Light Bulb e 202v");
 
 	/* Initialize */
 	configure_gpio();
