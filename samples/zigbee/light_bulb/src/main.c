@@ -153,10 +153,33 @@ ZB_ZCL_DECLARE_ON_OFF_ATTRIB_LIST(
 	on_off_attr_list,
 	&dev_ctx.on_off_attr.on_off);
 
+#if 0
 ZB_ZCL_DECLARE_LEVEL_CONTROL_ATTRIB_LIST(
 	level_control_attr_list,
 	&dev_ctx.level_control_attr.current_level,
 	&dev_ctx.level_control_attr.remaining_time);
+
+
+#elif 1
+
+zb_uint8_t g_attr_level_control_start_up_current_level;
+zb_uint8_t g_attr_level_control_options = 0x00;
+
+/*   In ZC-shell use commands:                                                            */
+/* zdo bind on {Bulb-LongAddr-hex} 10 {ZC-LongAddr-hex} 64 0x0008 0x{Bulb-ShortAddr-hex}  */
+/* zcl subscribe on 0x{Bulb-ShortAddr-hex} 10 0x0008 0x0104 0x4000 32 5 20                */
+/* to setup reporting of "g_attr_level_control_start_up_current_level".                   */
+
+ZB_ZCL_DECLARE_LEVEL_CONTROL_ATTRIB_LIST_EXT(
+	level_control_attr_list,
+	&dev_ctx.level_control_attr.current_level,
+	&dev_ctx.level_control_attr.remaining_time,
+    /* extended --> */
+    &g_attr_level_control_start_up_current_level,
+    &g_attr_level_control_options);
+
+#endif  // #if 0|1     //   DECLARE_LEVEL_CONTROL_ATTRIB_LIST
+
 
 ZB_DECLARE_DIMMABLE_LIGHT_CLUSTER_LIST(
 	dimmable_light_clusters,
@@ -177,7 +200,7 @@ ZBOSS_DECLARE_DEVICE_CTX_1_EP(
 	dimmable_light_ctx,
 	dimmable_light_ep);
 
-#define ZCL_CONFIG_INTERN_VERSION_CURRENT  0x0101u
+#define ZCL_CONFIG_INTERN_VERSION_CURRENT  0x0201u
 #define ZCL_CONFIG_INTERN_VERSION_UNKNOWN  0xFFFFu
 zb_uint16_t zcl_config_intern_ver_in_nvram = ZCL_CONFIG_INTERN_VERSION_UNKNOWN;
 
@@ -588,7 +611,7 @@ int main(void)
 	int blink_status = 0;
 	int err;
 
-	LOG_INF("Starting ZBOSS Light Bulb e 100v");
+	LOG_INF("Starting ZBOSS Light Bulb e 201v");
 
 	/* Initialize */
 	configure_gpio();

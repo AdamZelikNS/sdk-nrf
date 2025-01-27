@@ -39,10 +39,10 @@
 
 /** Number of attribute for reporting on Dimmable Light device */
 #define ZB_DIMMABLE_LIGHT_REPORT_ATTR_COUNT \
-	(ZB_ZCL_ON_OFF_REPORT_ATTR_COUNT + ZB_ZCL_LEVEL_CONTROL_REPORT_ATTR_COUNT)
+	(ZB_ZCL_ON_OFF_REPORT_ATTR_COUNT + 16 + ZB_ZCL_LEVEL_CONTROL_REPORT_ATTR_COUNT)
 
 /** Continuous value change attribute count */
-#define ZB_DIMMABLE_LIGHT_CVC_ATTR_COUNT 1
+#define ZB_DIMMABLE_LIGHT_CVC_ATTR_COUNT 4
 
 /** @endcond */ /* internals_doc */
 
