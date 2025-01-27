@@ -200,7 +200,7 @@ ZBOSS_DECLARE_DEVICE_CTX_1_EP(
 	dimmable_light_ctx,
 	dimmable_light_ep);
 
-#define ZCL_CONFIG_INTERN_VERSION_CURRENT  0x0201u
+#define ZCL_CONFIG_INTERN_VERSION_CURRENT  0x0203u
 #define ZCL_CONFIG_INTERN_VERSION_UNKNOWN  0xFFFFu
 zb_uint16_t zcl_config_intern_ver_in_nvram = ZCL_CONFIG_INTERN_VERSION_UNKNOWN;
 
@@ -611,7 +611,7 @@ int main(void)
 	int blink_status = 0;
 	int err;
 
-	LOG_INF("Starting ZBOSS Light Bulb e 202v");
+	LOG_INF("Starting ZBOSS Light Bulb e 203v");
 
 	/* Initialize */
 	configure_gpio();
