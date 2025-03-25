@@ -13,6 +13,7 @@ project("Zigbee light bulb with Scenes")
 # NORDIC SDK APP START
 target_sources(app PRIVATE
   src/main.c
+  src/custom_zb_ep.c
 )
 
 target_include_directories(app PRIVATE include)

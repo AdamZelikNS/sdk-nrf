@@ -26,6 +26,9 @@
 #include <zigbee/zigbee_zcl_scenes.h>
 #include <zb_nrf_platform.h>
 #include "zb_dimmable_light.h"
+#include "custom_zb_ep.h"
+
+#define ZIGBEE_C105P_ENABLED            1
 
 #define RUN_STATUS_LED                  DK_LED1
 #define RUN_LED_BLINK_INTERVAL          1000
@@ -172,9 +175,17 @@ ZB_DECLARE_DIMMABLE_LIGHT_EP(
 	DIMMABLE_LIGHT_ENDPOINT,
 	dimmable_light_clusters);
 
+#if ZIGBEE_C105P_ENABLED
+extern zb_af_endpoint_desc_t c105_client_ep;
+
+ZBOSS_DECLARE_DEVICE_CTX_2_EP(dimmable_light_ctx,
+			      c105_client_ep,
+			      dimmable_light_ep);
+#else
 ZBOSS_DECLARE_DEVICE_CTX_1_EP(
 	dimmable_light_ctx,
 	dimmable_light_ep);
+#endif
 
 /**@brief Starts identifying the device.
  *
@@ -524,7 +535,7 @@ int main(void)
 	int blink_status = 0;
 	int err;
 
-	LOG_INF("Starting ZBOSS Light Bulb example");
+	LOG_INF("Starting ZBOSS Light Bulb example  (dz-341144)");
 
 	/* Initialize */
 	configure_gpio();
@@ -533,6 +544,10 @@ int main(void)
 		LOG_ERR("settings initialization failed");
 	}
 	register_factory_reset_button(FACTORY_RESET_BUTTON);
+
+#if ZIGBEE_C105P_ENABLED
+	zigbee_c105p_init();
+#endif
 
 	/* Register callback for handling ZCL commands. */
 	ZB_ZCL_REGISTER_DEVICE_CB(zcl_device_cb);
@@ -545,6 +560,9 @@ int main(void)
 
 	/* Register handler to identify notifications. */
 	ZB_AF_SET_IDENTIFY_NOTIFICATION_HANDLER(DIMMABLE_LIGHT_ENDPOINT, identify_cb);
+#if ZIGBEE_C105P_ENABLED
+	ZB_AF_SET_IDENTIFY_NOTIFICATION_HANDLER(ZIGBEE_CU0_ENDPOINT, identify_cb);
+#endif
 
 	/* Initialize ZCL scene table */
 	zcl_scenes_init();
@@ -554,6 +572,8 @@ int main(void)
 	if (err) {
 		LOG_ERR("settings loading failed");
 	}
+
+	zb_af_set_data_indication(cu0_data_indicatn);
 
 	/* Start Zigbee default thread */
 	zigbee_enable();
