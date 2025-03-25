@@ -190,7 +190,7 @@ static void light_switch_button_handler(struct k_timer *timer);
 static void find_light_bulb_alarm(struct k_timer *timer);
 static void find_light_bulb(zb_bufid_t bufid);
 static void light_switch_send_on_off(zb_bufid_t bufid, zb_uint16_t on_off);
-
+static void light_switch_send_c105p(zb_bufid_t bufid, zb_uint16_t cmd_id);
 
 /**@brief Starts identifying the device.
  *
@@ -294,9 +294,9 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 		k_timer_stop(&buttons_ctx.alarm);
 
 		if (atomic_set(&buttons_ctx.long_poll, ZB_FALSE) == ZB_FALSE) {
-			/* Allocate output buffer and send on/off command. */
-			zb_err_code = zb_buf_get_out_delayed_ext(
-				light_switch_send_on_off, cmd_id, 0);
+  			/* Allocate output buffer and send some C105 profile targeted command. */
+  			zb_err_code = zb_buf_get_out_delayed_ext(
+  				light_switch_send_c105p, cmd_id, 0);
 			ZB_ERROR_CHECK(zb_err_code);
 		}
 		break;
@@ -394,6 +394,39 @@ static void light_switch_send_on_off(zb_bufid_t bufid, zb_uint16_t cmd_id)
 			       ZB_ZCL_DISABLE_DEFAULT_RESPONSE,
 			       cmd_id,
 			       NULL);
+}
+
+#ifndef ZB_ZCL_CLUSTER_ID_CUSTOM
+#define ZB_ZCL_CLUSTER_ID_CUSTOM 0x1A0AU
+#endif
+
+#define DBG0_ZCL_CONSTRUCT_SPECIFIC_COMMAND_REQ_FRAME_CONTROL(buf_ptr, fr_dir, def_resp) \
+  ZB_ZCL_CONSTRUCT_FRAME_CONTROL(ZB_ZCL_FRAME_TYPE_CLUSTER_SPECIFIC, ZB_ZCL_NOT_MANUFACTURER_SPECIFIC, \
+                                 (fr_dir), (def_resp)), \
+    0,                          /* No manuf_code */
+#define DBG0_ZCL_CONSTRUCT_COMMAND_HEADER_REQ(data_ptr, tsn, cmd_id) (cmd_id), NULL)
+
+static void light_switch_send_c105p(zb_bufid_t bufid, zb_uint16_t cmd_id)
+{
+    zb_bufid_t buffer            = bufid;
+    zb_uint16_t addr             = bulb_ctx.short_addr;
+    zb_uint16_t dst_addr_mode    = ZB_APS_ADDR_MODE_16_ENDP_PRESENT;
+    zb_uint16_t dst_ep           = 11;
+    zb_uint16_t dst_clu          = ZB_ZCL_CLUSTER_ID_CUSTOM;
+    zb_uint16_t ep               = LIGHT_SWITCH_ENDPOINT;
+    zb_uint16_t fdir             = ZB_ZCL_FRAME_DIRECTION_TO_SRV; 
+    zb_uint16_t const prof_id    = 0xC105u;
+    zb_uint16_t dis_default_resp = ZB_ZCL_DISABLE_DEFAULT_RESPONSE;
+    zb_uint16_t command_id       = cmd_id;
+
+    LOG_INF("Send C105p debug command: %d", cmd_id);
+
+    zb_uint8_t* ptr = ZB_ZCL_START_PACKET_REQ(buffer) \
+      DBG0_ZCL_CONSTRUCT_SPECIFIC_COMMAND_REQ_FRAME_CONTROL(ptr, fdir, dis_default_resp) \
+      DBG0_ZCL_CONSTRUCT_COMMAND_HEADER_REQ(ptr, ZB_ZCL_GET_SEQ_NUM(), command_id) ;
+    ZB_ZCL_FINISH_PACKET(buffer, ptr) \
+      ZB_ZCL_SEND_COMMAND_SHORT( \
+        buffer, addr, dst_addr_mode, dst_ep, ep, prof_id, dst_clu, NULL);
 }
 
 /**@brief Function for sending step requests to the light bulb.
@@ -724,7 +757,7 @@ static struct nus_entry commands[] = {
 
 int main(void)
 {
-	LOG_INF("Starting ZBOSS Light Switch example");
+	LOG_INF("Starting ZBOSS Light Switch example (dz-341144)");
 
 	/* Initialize. */
 	configure_gpio();
