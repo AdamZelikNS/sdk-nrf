@@ -19,18 +19,14 @@
 	(DEVICE_DT_GET(FLASH_MAP_PM_DEV(i))),				\
 	(DEVICE_DT_GET(DT_NODELABEL(FLASH_MAP_PM_DEV(i)))))
 
-#define FLASH_MAP_PM_DRIVER_KCONFIG(x) UTIL_CAT(x, _DEFAULT_DRIVER_KCONFIG)
-
 /* Return 1 if device node, in DTS, for partition is enabled */
 #define FLASH_MAP_PM_HAS_DEV(x)							\
 	UTIL_OR(DT_NODE_HAS_STATUS_OKAY(FLASH_MAP_PM_DEV(x)),			\
 		DT_NODE_HAS_STATUS_OKAY(DT_NODELABEL(FLASH_MAP_PM_DEV(x))))
 
-/* All conditions for a device are met: device is enabled and Kconfig for
- * driver is enabled.
- */
-#define FLASH_MAP_PM_DEV_HAS_ALL(x)					\
-	UTIL_AND(FLASH_MAP_PM_HAS_DEV(x), FLASH_MAP_PM_DRIVER_KCONFIG(x))
+/* All conditions for a device are met: device is enabled and .. never mind. 
+  */
+#define FLASH_MAP_PM_DEV_HAS_ALL(x)	 FLASH_MAP_PM_HAS_DEV(x)
 
 #define FLASH_MAP_ID(i) UTIL_CAT(i, _ID)
 #define FLASH_MAP_OFFSET(i) UTIL_CAT(i, _OFFSET)
